@@ -1,0 +1,100 @@
+﻿@page "/steamlatestdownloads"
+@using DeveLanCacheUI_Frontend.DbModels;
+@inject HttpClient Http
+
+<PageTitle>Steam Latest Downloads</PageTitle>
+
+<h1>Steam Latest Downloads</h1>
+
+<p>Showing the latest Steam downloads.</p>
+
+@if (downloadEvents == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Timestamp</th>
+                <th>App</th>
+                <th>Depot</th>
+                <th>Client</th>
+                <th>Cache Hit</th>
+                <th>Cache Miss</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var downloadEvent in downloadEvents)
+            {
+                double cacheHitPercent = 0.0;
+                double cacheMissPercent = 0.0;
+                if ((downloadEvent.CacheMissBytes + downloadEvent.CacheHitBytes) != 0)
+                {
+                    cacheHitPercent = Math.Round(((double)downloadEvent.CacheHitBytes / (downloadEvent.CacheMissBytes + downloadEvent.CacheHitBytes)) * 100, 2);
+                    cacheMissPercent = Math.Round(((double)downloadEvent.CacheMissBytes / (downloadEvent.CacheMissBytes + downloadEvent.CacheHitBytes)) * 100, 2);
+                }
+                var appId = downloadEvent.SteamDepot?.SteamAppId ?? 0;
+                var depotId = downloadEvent.SteamDepotId;
+                var appHref = appId != 0 ? $"https://steamdb.info/app/{appId}/" : "";
+                var depotHref = depotId != 0 ? $"https://steamdb.info/depot/{depotId}/" : "";
+                var imgUrl = appId != 0 ? $"https://cdn.cloudflare.steamstatic.com/steam/apps/{appId}/header.jpg" : "";
+                <tr>
+                    <td>
+                        @downloadEvent.CreatedAt - @downloadEvent.LastUpdatedAt
+                    </td>
+                    <td>
+                        @if (appId != 0)
+                        {
+                            <a href="@appHref" target="_blank">
+                                <img src="@imgUrl" style="width:200px;height:auto;" />
+                                @*@(downloadEvent.SteamDepot?.SteamApp?.AppName ?? "unknown")*@
+                            </a>
+                        }
+                        else
+                        {
+                            <span>@(downloadEvent.SteamDepot?.SteamApp?.AppName ?? "unknown")</span>
+                        }
+                    </td>
+                    <td>
+                        @if (depotId != 0)
+                        {
+                            <a href="@depotHref" target="_blank">
+                                @downloadEvent.SteamDepotId
+                            </a>
+                        }
+                        else
+                        {
+                            <span>@downloadEvent.SteamDepotId</span>
+                        }
+                    </td>
+                    <td>@downloadEvent.ClientIp</td>
+                    <td>@($"{DeveCoolLib.Conversion.ValuesToStringHelper.BytesToString(downloadEvent.CacheHitBytes)} ({cacheHitPercent}%)")</td>
+                    <td>@($"{DeveCoolLib.Conversion.ValuesToStringHelper.BytesToString(downloadEvent.CacheMissBytes)} ({cacheMissPercent}%)")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <button class="btn btn-primary" @onclick="LoadMore">Load More</button>
+}
+
+@code {
+    private List<DbSteamAppDownloadEvent> downloadEvents = new List<DbSteamAppDownloadEvent>();
+    private int loadedCount = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadMore();
+    }
+
+    private async Task LoadMore()
+    {
+        var newEvents = await Http.GetFromJsonAsync<DbSteamAppDownloadEvent[]>($"http://localhost:5184/SteamDownloadEvents?skip={loadedCount}&count=40");
+        if (newEvents != null)
+        {
+            downloadEvents.AddRange(newEvents);
+            loadedCount += newEvents.Length;
+        }
+    }
+}
