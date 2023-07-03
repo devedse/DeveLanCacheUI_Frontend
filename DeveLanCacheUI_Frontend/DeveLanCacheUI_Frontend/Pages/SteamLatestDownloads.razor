@@ -88,7 +88,7 @@ else
 
     private async Task LoadMore()
     {
-        var newEvents = await Http.GetFromJsonAsync<DbSteamAppDownloadEvent[]>($"http://localhost:5184/SteamDownloadEvents?skip={loadedCount}&count=40");
+        var newEvents = await Http.GetFromJsonAsync<DbSteamAppDownloadEvent[]>($"http://localhost:5184/SteamDownloadEvents/GetBySkipAndCount?skip={loadedCount}&count=40");
         if (newEvents != null)
         {
             downloadEvents.AddRange(newEvents);
