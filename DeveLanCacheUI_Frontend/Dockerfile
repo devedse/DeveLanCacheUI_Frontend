@@ -1,6 +1,6 @@
 FROM nginx:stable-alpine AS base
 COPY ./DeveLanCacheUI_Frontend/nginxconfig/nginx.conf /etc/nginx/nginx.conf
-COPY ./nginxconfig/30-setupenvironmentvariables.sh /docker-entrypoint.d/30-setupenvironmentvariables.sh
+COPY ./DeveLanCacheUI_Frontend/nginxconfig/30-setupenvironmentvariables.sh /docker-entrypoint.d/30-setupenvironmentvariables.sh
 RUN chmod +x /docker-entrypoint.d/30-setupenvironmentvariables.sh
 WORKDIR /app
 EXPOSE 80
