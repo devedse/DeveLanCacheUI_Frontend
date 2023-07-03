@@ -9,7 +9,7 @@ namespace DeveLanCacheUI_Frontend.DbModels
         public int Id { get; set; }
 
         public int? SteamAppId { get; set; }
-        public DbSteamApp? SteamApp { get; set; }
+        public App? SteamApp { get; set; }
 
         [JsonIgnore]
         public virtual ICollection<DbSteamAppDownloadEvent> DownloadEvents { get; set; }
