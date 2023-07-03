@@ -7,7 +7,7 @@
     </div>
 </div>
 
-<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
+<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu" style="position: relative;">
     <nav class="flex-column">
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
@@ -32,7 +32,7 @@
             </NavLink>
         </div>
     </nav>
-    <div class="version-info px-3">
+    <div class="version-info px-3" style="position: absolute; bottom: 10px; color: white; font-weight: bold;">
         <small>Version: @Version</small>
     </div>
 </div>
@@ -55,6 +55,7 @@
 
     private string GetVersion()
     {
+        Console.WriteLine("Getting version...");
         var assembly = System.Reflection.Assembly.GetExecutingAssembly();
         var version = assembly.GetName().Version.ToString();
         return version;
