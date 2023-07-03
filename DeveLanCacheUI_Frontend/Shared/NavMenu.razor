@@ -32,15 +32,31 @@
             </NavLink>
         </div>
     </nav>
+    <div class="version-info px-3">
+        <small>Version: @Version</small>
+    </div>
 </div>
 
 @code {
     private bool collapseNavMenu = true;
-
     private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private string Version { get; set; }
 
     private void ToggleNavMenu()
     {
         collapseNavMenu = !collapseNavMenu;
+    }
+
+    protected override void OnInitialized()
+    {
+        Version = GetVersion();
+    }
+
+    private string GetVersion()
+    {
+        var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+        var version = assembly.GetName().Version.ToString();
+        return version;
     }
 }
