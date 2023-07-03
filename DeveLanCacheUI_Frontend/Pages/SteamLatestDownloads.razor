@@ -86,15 +86,25 @@ else
 @code {
     private List<DbSteamAppDownloadEvent> downloadEvents = new List<DbSteamAppDownloadEvent>();
     private int loadedCount = 0;
+    private string backendUrl;
+
+    @inject IJSRuntime JSRuntime
 
     protected override async Task OnInitializedAsync()
     {
+        backendUrl = await JSRuntime.InvokeAsync<string>("eval", "window.ENV.BACKENDURL");
+        Console.WriteLine($"Loaded Backend Url: {backendUrl}");
         await LoadMore();
     }
 
     private async Task LoadMore()
     {
-        var newEvents = await Http.GetFromJsonAsync<DbSteamAppDownloadEvent[]>($"http://localhost:5184/SteamDownloadEvents/GetBySkipAndCount?skip={loadedCount}&count=40");
+        if (!backendUrl.EndsWith("/"))
+        {
+            backendUrl += "/";
+        }
+
+        var newEvents = await Http.GetFromJsonAsync<DbSteamAppDownloadEvent[]>($"{backendUrl}SteamDownloadEvents/GetBySkipAndCount?skip={loadedCount}&count=40");
         if (newEvents != null)
         {
             downloadEvents.AddRange(newEvents);
