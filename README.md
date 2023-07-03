@@ -1,6 +1,9 @@
 # DeveLanCacheUI_Frontend
 A UI for Lan Cache
 
+## How to run this
+See: https://github.com/devedse/DeveLanCacheUI_Backend/
+
 ## Build status
 
 | GitHubActions Builds |
