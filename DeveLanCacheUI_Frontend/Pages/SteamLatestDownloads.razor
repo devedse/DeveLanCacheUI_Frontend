@@ -70,11 +70,11 @@ else
                     <td>@downloadEvent.ClientIp</td>
                     <td>
                         <progress max="100" value="@cacheHitPercent"></progress>
-                        @($"{DeveCoolLib.Conversion.ValuesToStringHelper.BytesToString(downloadEvent.CacheHitBytes)} ({cacheHitPercent}%)")
+                        @($"{DeveLanCacheUI_Frontend.Conversion.ValuesToStringHelper.BytesToString(downloadEvent.CacheHitBytes)} ({cacheHitPercent}%)")
                     </td>
                     <td>
                         <progress max="100" value="@cacheMissPercent"></progress>
-                        @($"{DeveCoolLib.Conversion.ValuesToStringHelper.BytesToString(downloadEvent.CacheMissBytes)} ({cacheMissPercent}%)")
+                        @($"{DeveLanCacheUI_Frontend.Conversion.ValuesToStringHelper.BytesToString(downloadEvent.CacheMissBytes)} ({cacheMissPercent}%)")
                     </td>
                 </tr>
             }
