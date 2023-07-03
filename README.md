@@ -1,5 +1,8 @@
 # DeveLanCacheUI_Frontend
-A UI for Lan Cache
+A UI for Lan Cache. I'm tracking progress mostly in the Backend repository:
+https://github.com/devedse/DeveLanCacheUI_Backend/
+
+![ScreenshotFrontend](Screenshot_Frontend.png)
 
 ## How to run this
 See: https://github.com/devedse/DeveLanCacheUI_Backend/
