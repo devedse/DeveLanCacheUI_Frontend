@@ -69,10 +69,11 @@
             .WithUrl($"{backendUrl}lancachehub")
             .Build();
 
-        hubConnection.On<string, string>("ReceiveMessage", (user, message) =>
+        hubConnection.On<string, string>("ReceiveMessage", async (user, message) =>
         {
             messages.Add((user, message, DateTime.Now)); // Store timestamp along with message
             StateHasChanged();
+            await JSRuntime.InvokeVoidAsync("scrollChatToBottom"); // Call JavaScript function
         });
 
         await hubConnection.StartAsync();
@@ -134,7 +135,9 @@
 
 <style>
     .chat-box {
-        background-color: #f5f5f5; /* Change the background color */
+        background-color: #f5f5f5;
+        height: 80vh; /* Limit the height to 80% of the viewport height */
+        overflow-y: auto; /* Enable vertical scrolling */
     }
 
     .msg_cotainer_send {
