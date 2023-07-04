@@ -93,16 +93,17 @@ else
     protected override async Task OnInitializedAsync()
     {
         backendUrl = await JSRuntime.InvokeAsync<string>("eval", "window.ENV.BACKENDURL");
+        if (!backendUrl.EndsWith("/"))
+        {
+            backendUrl += "/";
+        }
         Console.WriteLine($"Loaded Backend Url: {backendUrl}");
         await LoadMore();
     }
 
     private async Task LoadMore()
     {
-        if (!backendUrl.EndsWith("/"))
-        {
-            backendUrl += "/";
-        }
+
 
         var newEvents = await Http.GetFromJsonAsync<DbSteamAppDownloadEvent[]>($"{backendUrl}SteamDownloadEvents/GetBySkipAndCount?skip={loadedCount}&count=40");
         if (newEvents != null)

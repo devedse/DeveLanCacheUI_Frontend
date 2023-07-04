@@ -1,4 +1,7 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@using static System.Net.WebRequestMethods;
+@inject HttpClient Http
+
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="">DeveLanCacheUI_Frontend</a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
@@ -33,7 +36,8 @@
         </div>
     </nav>
     <div class="version-info px-3" style="position: absolute; bottom: 10px; color: white; font-weight: bold;">
-        <small>Version: @Version</small>
+        <small>Frontend Version: @FrontendVersion</small>
+        <small>Backend Version: @BackendVersion</small>
     </div>
 </div>
 
@@ -41,23 +45,49 @@
     private bool collapseNavMenu = true;
     private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
 
-    private string Version { get; set; }
+    private string backendUrl;
+
+    private string FrontendVersion { get; set; }
+    private string BackendVersion { get; set; }
+
+    @inject IJSRuntime JSRuntime
 
     private void ToggleNavMenu()
     {
         collapseNavMenu = !collapseNavMenu;
     }
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        Version = GetVersion();
+        backendUrl = await JSRuntime.InvokeAsync<string>("eval", "window.ENV.BACKENDURL");
+        if (!backendUrl.EndsWith("/"))
+        {
+            backendUrl += "/";
+        }
+        Console.WriteLine($"Loaded Backend Url: {backendUrl}");
+
+        FrontendVersion = GetVersion();
+
+        BackendVersion = await GetBackendVersion();
     }
 
     private string GetVersion()
     {
-        Console.WriteLine("Getting version...");
         var assembly = System.Reflection.Assembly.GetExecutingAssembly();
         var version = assembly.GetName().Version.ToString();
         return version;
+    }
+
+    private async Task<string> GetBackendVersion()
+    {
+        var status = await Http.GetFromJsonAsync<StatusModel>($"{backendUrl}Status");
+        return status.Version;
+    }
+
+    public class StatusModel
+    {
+        public string ApplicationName { get; set; }
+        public string Version { get; set; }
+        public string UpTime { get; set; }
     }
 }
