@@ -14,12 +14,24 @@
                     Chat
                 </div>
                 <div class="card-body chat-box overflow-auto">
-                    <ul id="messagesList" class="list-group">
-                        @foreach (var message in messages)
+                    <div id="messagesList">
+                        @foreach (var (user, message, timestamp) in messages)
                         {
-                            <li class="list-group-item">@message</li>
+                            var isMine = user == userInput;
+                            var offsetClass = isMine ? "justify-content-end" : "justify-content-start";
+                            var messageClass = isMine ? "msg_cotainer_send" : "msg_cotainer_receive";
+                            <div class="d-flex @offsetClass mb-4">
+                                <div class="@messageClass">
+                                    <div><b>@user</b></div>
+                                    <div>@message</div>
+                                    <span class="msg_time_send">@timestamp.ToString("t")</span>
+                                </div>
+                                <div class="img_cont_msg">
+                                    <img src="https://static.turbosquid.com/Preview/001292/481/WV/_D.jpg" class="rounded-circle user_img_msg">
+                                </div>
+                            </div>
                         }
-                    </ul>
+                    </div>
                 </div>
                 <div class="card-footer">
                     <div class="input-group">
@@ -34,18 +46,18 @@
     </div>
 </div>
 
+
 @code {
     private HubConnection? hubConnection;
-    private List<string> messages = new List<string>();
-    private string messageInput;
+    private List<(string, string, DateTime)> messages = new List<(string, string, DateTime)>();
+    private string? userInput;
+    private string? messageInput;
 
     private string backendUrl;
 
-    private string userIdentifier;
-
     protected override async Task OnInitializedAsync()
     {
-        userIdentifier = GenerateIdentifier();
+        userInput = GenerateIdentifier();
 
         backendUrl = await JSRuntime.InvokeAsync<string>("eval", "window.ENV.BACKENDURL");
         if (!backendUrl.EndsWith("/"))
@@ -59,13 +71,12 @@
 
         hubConnection.On<string, string>("ReceiveMessage", (user, message) =>
         {
-            var encodedMsg = $"{user}: {message}";
-            messages.Add(encodedMsg);
+            messages.Add((user, message, DateTime.Now)); // Store timestamp along with message
             StateHasChanged();
         });
 
         await hubConnection.StartAsync();
-        await hubConnection.SendAsync("SendMessage", userIdentifier, "joined the chat");
+        await hubConnection.SendAsync("SendMessage", userInput, "joined the chat");
     }
 
     private string GenerateIdentifier()
@@ -97,7 +108,7 @@
     {
         if (hubConnection is not null)
         {
-            await hubConnection.SendAsync("SendMessage", userIdentifier, messageInput);
+            await hubConnection.SendAsync("SendMessage", userInput, messageInput);
             messageInput = string.Empty;
         }
     }
@@ -120,3 +131,47 @@
         }
     }
 }
+
+<style>
+    .chat-box {
+        background-color: #f5f5f5; /* Change the background color */
+    }
+
+    .msg_cotainer_send {
+        border-radius: 20px; /* Decrease the border radius */
+        background-color: #78e08f;
+        color: white;
+        padding: 18px;
+        position: relative;
+        max-width: 70%;
+    }
+
+    .msg_cotainer_receive {
+        border-radius: 20px; /* Decrease the border radius */
+        background-color: #d0d0d0; /* Change this to a color that stands out against the gray background */
+        color: #222;
+        padding: 18px;
+        position: relative;
+        max-width: 70%;
+    }
+
+    .msg_time_send {
+        position: absolute;
+        bottom: 0;
+        right: 18px;
+        color: rgb(20,20,20);
+        font-size: 10px;
+    }
+
+    .img_cont_msg {
+        margin-top: auto;
+        margin-bottom: auto;
+        margin-left: 10px;
+    }
+
+    .user_img_msg {
+        height: 40px;
+        width: 40px;
+        border: 1.5px solid #78e08f;
+    }
+</style>
