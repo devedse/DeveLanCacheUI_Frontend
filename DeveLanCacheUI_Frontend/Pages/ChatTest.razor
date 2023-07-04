@@ -1,0 +1,122 @@
+﻿@page "/chattest"
+@using Microsoft.AspNetCore.SignalR.Client
+@inject NavigationManager Navigation
+@inject IJSRuntime JSRuntime
+@implements IAsyncDisposable
+
+<PageTitle>Chat Client</PageTitle>
+
+<div class="container pt-5">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    Chat
+                </div>
+                <div class="card-body chat-box overflow-auto">
+                    <ul id="messagesList" class="list-group">
+                        @foreach (var message in messages)
+                        {
+                            <li class="list-group-item">@message</li>
+                        }
+                    </ul>
+                </div>
+                <div class="card-footer">
+                    <div class="input-group">
+                        <input type="text" class="form-control" @bind="messageInput" @onkeyup="CheckForEnter" size="50" placeholder="Enter message" />
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" type="button" @onclick="Send" disabled="@(!IsConnected)">Send</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private HubConnection? hubConnection;
+    private List<string> messages = new List<string>();
+    private string messageInput;
+
+    private string backendUrl;
+
+    private string userIdentifier;
+
+    protected override async Task OnInitializedAsync()
+    {
+        userIdentifier = GenerateIdentifier();
+
+        backendUrl = await JSRuntime.InvokeAsync<string>("eval", "window.ENV.BACKENDURL");
+        if (!backendUrl.EndsWith("/"))
+        {
+            backendUrl += "/";
+        }
+
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl($"{backendUrl}lancachehub")
+            .Build();
+
+        hubConnection.On<string, string>("ReceiveMessage", (user, message) =>
+        {
+            var encodedMsg = $"{user}: {message}";
+            messages.Add(encodedMsg);
+            StateHasChanged();
+        });
+
+        await hubConnection.StartAsync();
+        await hubConnection.SendAsync("SendMessage", userIdentifier, "joined the chat");
+    }
+
+    private string GenerateIdentifier()
+    {
+        var adjectives = new[]
+        {
+            "Amusing", "Bouncy", "Cheerful", "Delightful", "Energetic", "Fancy", "Goofy", "Hilarious", "Inquisitive",
+            "Joyful", "Keen", "Lively", "Merry", "Nosy", "Optimistic", "Playful", "Quirky", "Radiant", "Silly",
+            "Thrilled", "Upbeat", "Vibrant", "Whimsical", "Xenial", "Youthful", "Zany", "Animated", "Blissful",
+            "Curious", "Dazzling"
+        };
+
+        var nouns = new[]
+        {
+            "Apricot", "Bagel", "Cantaloupe", "Donut", "Eclair", "Fudge", "Gingerbread", "Honeydew", "Icecream",
+            "Jellybean", "Kiwi", "Lollipop", "Muffin", "Nectarine", "Orange", "Pancake", "Quince", "Raspberry",
+            "Strawberry", "Tangerine", "UgliFruit", "Vanilla", "Waffle", "Xigua", "YellowWatermelon", "Zucchini",
+            "Apple", "Blueberry", "Cherry", "Dumpling"
+        };
+
+        var rand = new Random();
+        var adjective = adjectives[rand.Next(adjectives.Length)];
+        var noun = nouns[rand.Next(nouns.Length)];
+
+        return $"{adjective} {noun}";
+    }
+
+    private async Task Send()
+    {
+        if (hubConnection is not null)
+        {
+            await hubConnection.SendAsync("SendMessage", userIdentifier, messageInput);
+            messageInput = string.Empty;
+        }
+    }
+
+    private async Task CheckForEnter(KeyboardEventArgs e)
+    {
+        if (e.Code == "Enter" || e.Code == "NumpadEnter")
+        {
+            await Send();
+        }
+    }
+
+    public bool IsConnected => hubConnection?.State == HubConnectionState.Connected;
+
+    public async ValueTask DisposeAsync()
+    {
+        if (hubConnection is not null)
+        {
+            await hubConnection.DisposeAsync();
+        }
+    }
+}
