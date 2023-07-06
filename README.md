@@ -30,9 +30,3 @@ See: https://github.com/devedse/DeveLanCacheUI_Backend/
 | SonarQube |
 |:---------:|
 | [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=DeveLanCacheUI_Frontend&metric=alert_status)](https://sonarcloud.io/dashboard?id=DeveLanCacheUI_Frontend) |
-
-## Package
-
-| NuGet |
-|:-----:|
-| [![NuGet](https://img.shields.io/nuget/v/DeveLanCacheUI_Frontend.svg)](https://www.nuget.org/packages/DeveLanCacheUI_Frontend/) |
