@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace DeveLanCacheUI_Frontend.DbModels
+namespace DeveLanCacheUI_Frontend.ApiModels
 {
     public class App
     {

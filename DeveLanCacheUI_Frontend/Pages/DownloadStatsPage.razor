@@ -1,0 +1,191 @@
+﻿@page "/downloadstats"
+@using Microsoft.AspNetCore.SignalR.Client;
+@using DeveLanCacheUI_Frontend.ApiModels;
+@inject HttpClient Http
+
+<PageTitle>Download Stats</PageTitle>
+
+<h1>
+    Download Stats
+    <span class="status-ball @(hubConnection?.State == HubConnectionState.Connected ? "connected" : "disconnected")"
+          title="@(hubConnection?.State == HubConnectionState.Connected ? "Connected" : "Disconnected")">
+    </span>
+    @if (loading)
+    {
+        <span class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </span>
+    }
+</h1>
+
+<table id="clientStats" class="table">
+    <thead>
+        <tr>
+            <th>Client IP</th>
+            <th>Total Cache Hit Bytes</th>
+            <th>Total Cache Miss Bytes</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            var totalMissService = clientDownloadStats.Sum(t => t.TotalCacheMissBytes);
+            var totalHitService = clientDownloadStats.Sum(t => t.TotalCacheHitBytes);
+            var uberTotalSerivce = totalMissService + totalHitService;
+            foreach (var stats in clientDownloadStats.OrderByDescending(t => t.TotalCacheHitBytes))
+            {
+                double cacheHitPercent = 0.0;
+                double cacheMissPercent = 0.0;
+                if ((stats.TotalCacheMissBytes + stats.TotalCacheHitBytes) != 0)
+                {
+                    cacheHitPercent = Math.Round(((double)stats.TotalCacheHitBytes / (uberTotalSerivce)) * 100, 2);
+                    cacheMissPercent = Math.Round(((double)stats.TotalCacheMissBytes / (uberTotalSerivce)) * 100, 2);
+                }
+                <tr>
+                    <td>@stats.Identifier</td>
+                    <td>
+                        <progress max="100" value="@cacheHitPercent"></progress>
+                        @($"{DeveCoolLib.Conversion.ValuesToStringHelper.BytesToString(stats.TotalCacheHitBytes)} ({cacheHitPercent}%)")
+                    </td>
+                    <td>
+                        <progress max="100" value="@cacheMissPercent"></progress>
+                        @($"{DeveCoolLib.Conversion.ValuesToStringHelper.BytesToString(stats.TotalCacheMissBytes)} ({cacheMissPercent}%)")
+                    </td>
+                </tr>
+            }
+            <tr>
+                <td>Total</td>
+                <td>@DeveCoolLib.Conversion.ValuesToStringHelper.BytesToString(totalMissService)</td>
+                <td>@DeveCoolLib.Conversion.ValuesToStringHelper.BytesToString(totalHitService)</td>
+            </tr>
+        }
+    </tbody>
+</table>
+<h2>Service Download Stats</h2>
+<table id="serviceStats" class="table">
+    <thead>
+        <tr>
+            <th>Service</th>
+            <th>Total Cache Hit Bytes</th>
+            <th>Total Cache Miss Bytes</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            var totalMissClients = serviceDownloadStats.Sum(t => t.TotalCacheMissBytes);
+            var totalHitClients = serviceDownloadStats.Sum(t => t.TotalCacheHitBytes);
+            var uberTotalClients = totalMissService + totalHitService;
+            foreach (var stats in serviceDownloadStats.OrderByDescending(t => t.TotalCacheHitBytes))
+            {
+                double cacheHitPercent = 0.0;
+                double cacheMissPercent = 0.0;
+                if ((stats.TotalCacheMissBytes + stats.TotalCacheHitBytes) != 0)
+                {
+                    cacheHitPercent = Math.Round(((double)stats.TotalCacheHitBytes / (uberTotalClients)) * 100, 2);
+                    cacheMissPercent = Math.Round(((double)stats.TotalCacheMissBytes / (uberTotalClients)) * 100, 2);
+                }
+                <tr>
+                    <td>@stats.Identifier</td>
+                    <td>
+                        <progress max="100" value="@cacheHitPercent"></progress>
+                        @($"{DeveCoolLib.Conversion.ValuesToStringHelper.BytesToString(stats.TotalCacheHitBytes)} ({cacheHitPercent}%)")
+                    </td>
+                    <td>
+                        <progress max="100" value="@cacheMissPercent"></progress>
+                        @($"{DeveCoolLib.Conversion.ValuesToStringHelper.BytesToString(stats.TotalCacheMissBytes)} ({cacheMissPercent}%)")
+                    </td>
+                </tr>
+            }
+            <tr>
+                <td>Total</td>
+                <td>@DeveCoolLib.Conversion.ValuesToStringHelper.BytesToString(totalMissClients)</td>
+                <td>@DeveCoolLib.Conversion.ValuesToStringHelper.BytesToString(totalHitClients)</td>
+            </tr>
+        }
+
+    </tbody>
+</table>
+@code {
+    private List<DownloadStats> clientDownloadStats = new List<DownloadStats>();
+    private List<DownloadStats> serviceDownloadStats = new List<DownloadStats>();
+
+    private string backendUrl;
+    private HubConnection hubConnection;
+
+    private bool loading = true;
+
+    @inject IJSRuntime JSRuntime
+
+    protected override async Task OnInitializedAsync()
+    {
+        backendUrl = await JSRuntime.InvokeAsync<string>("eval", "window.ENV.BACKENDURL");
+        if (!backendUrl.EndsWith("/"))
+        {
+            backendUrl += "/";
+        }
+        Console.WriteLine($"Loaded Backend Url: {backendUrl}");
+        await LoadData();
+
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl($"{backendUrl}lancachehub")
+            .Build();
+
+        hubConnection.On("UpdateDownloadEvents", async () =>
+        {
+            Console.WriteLine($"{DateTime.Now}: UpdateDownloadEvents");
+            await LoadData();
+        });
+
+        await hubConnection.StartAsync();
+    }
+
+    private async Task LoadData()
+    {
+        loading = true;
+        StateHasChanged();
+        var newClientStats = await Http.GetFromJsonAsync<DownloadStats[]>($"{backendUrl}DownloadStats/GetDownloadStatsPerClient");
+        if (newClientStats != null)
+        {
+            clientDownloadStats = newClientStats.ToList();
+        }
+        var newServiceStats = await Http.GetFromJsonAsync<DownloadStats[]>($"{backendUrl}DownloadStats/GetDownloadStatsPerService");
+        if (newServiceStats != null)
+        {
+            serviceDownloadStats = newServiceStats.ToList();
+        }
+        loading = false;
+        StateHasChanged();
+    }
+
+    public bool IsConnected => hubConnection?.State == HubConnectionState.Connected;
+
+    public async ValueTask DisposeAsync()
+    {
+        if (hubConnection is not null)
+        {
+            await hubConnection.DisposeAsync();
+        }
+    }
+}
+
+<style>
+    .status-ball {
+        display: inline-block;
+        vertical-align: middle;
+        width: 25px;
+        height: 25px;
+        border-radius: 50%;
+        margin-right: 10px;
+        border: 2px solid white;
+        box-shadow: 0 0 10px 0 rgba(255, 255, 255, .3);
+        background: radial-gradient(circle at 30% 30%, #0f0, #0a0);
+    }
+
+    .connected {
+        border-color: #0f0;
+    }
+
+    .disconnected {
+        border-color: #f00;
+        background: radial-gradient(circle at 30% 30%, #f00, #a00);
+    }
+</style>

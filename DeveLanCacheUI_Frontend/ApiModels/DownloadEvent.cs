@@ -1,14 +1,16 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace DeveLanCacheUI_Frontend.DbModels
+namespace DeveLanCacheUI_Frontend.ApiModels
 {
-    public class DbSteamAppDownloadEvent
+    public class DownloadEvent
     {
-        [Key]
         public int Id { get; set; }
 
-        public int SteamDepotId { get; set; }
-        public DbSteamDepot SteamDepot { get; set; } = null!;
+        //steam/epicgames/wsus/epicgames
+        public string CacheIdentifier { get; set; }
+
+        public int? DownloadIdentifier { get; set; }
+        public string? DownloadIdentifierString { get; set; }
 
         public required string ClientIp { get; set; }
 
@@ -17,5 +19,8 @@ namespace DeveLanCacheUI_Frontend.DbModels
 
         public long CacheHitBytes { get; set; }
         public long CacheMissBytes { get; set; }
+
+
+        public SteamDepot? SteamDepot { get; set; }
     }
 }

@@ -1,12 +1,12 @@
-﻿@page "/steamlatestdownloads"
+﻿@page "/latestdownloads"
 @using DeveLanCacheUI_Frontend.ApiModels;
 @using Microsoft.AspNetCore.SignalR.Client;
 @inject HttpClient Http
 
-<PageTitle>Steam Latest Downloads</PageTitle>
+<PageTitle>Latest Downloads</PageTitle>
 
 <h1>
-    Steam Latest Downloads
+    Latest Downloads
     <span class="status-ball @(hubConnection?.State == HubConnectionState.Connected ? "connected" : "disconnected")"
           title="@(hubConnection?.State == HubConnectionState.Connected ? "Connected" : "Disconnected")">
     </span>
@@ -23,6 +23,7 @@
 <table class="table">
     <thead>
         <tr>
+            <th>Service</th>
             <th>Timestamp</th>
             <th>App</th>
             <th>Depot</th>
@@ -47,6 +48,9 @@
             var depotHref = downloadIdentifierString != null && downloadEvent.CacheIdentifier == "steam" ? $"https://steamdb.info/depot/{downloadIdentifierString}/" : null;
             var imgUrl = appId != 0 ? $"https://cdn.cloudflare.steamstatic.com/steam/apps/{appId}/header.jpg" : "";
             <tr>
+                <td>
+                    @downloadEvent.CacheIdentifier
+                </td>
                 <td>
                     @downloadEvent.CreatedAt - @downloadEvent.LastUpdatedAt
                 </td>
@@ -142,7 +146,7 @@
         loading = true;
         StateHasChanged();
 
-        var newEvents = await Http.GetFromJsonAsync<DownloadEvent[]>($"{backendUrl}DownloadEvents/GetFilteredBySkipAndCount?filter=steam&skip=0&count={loadedCount}&filter=steam");
+        var newEvents = await Http.GetFromJsonAsync<DownloadEvent[]>($"{backendUrl}DownloadEvents/GetBySkipAndCount?filter=steam&skip=0&count={loadedCount}");
         downloadEvents = newEvents.ToList();
         loading = false;
         StateHasChanged();
@@ -152,7 +156,7 @@
     {
         loading = true;
         StateHasChanged();
-        var newEvents = await Http.GetFromJsonAsync<DownloadEvent[]>($"{backendUrl}DownloadEvents/GetFilteredBySkipAndCount?skip={loadedCount}&count=40&filter=steam");
+        var newEvents = await Http.GetFromJsonAsync<DownloadEvent[]>($"{backendUrl}DownloadEvents/GetBySkipAndCount?skip={loadedCount}&count=40");
         if (newEvents != null)
         {
             downloadEvents.AddRange(newEvents);

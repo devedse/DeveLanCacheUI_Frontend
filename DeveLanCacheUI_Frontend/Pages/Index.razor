@@ -1,9 +1,55 @@
 ﻿@page "/"
 
-<PageTitle>Index</PageTitle>
+<PageTitle>Home - DeveLanCacheUI</PageTitle>
 
-<h1>Hello, world!</h1>
+<div class="container mt-5">
+    <h1 class="display-4 text-center">Welcome to DeveLanCacheUI!</h1>
+    <p class="lead text-center mt-4">
+        Your one-stop solution for visualizing and managing your LanCache application.
+    </p>
 
-Welcome to your new app.
+    <div class="row mt-5">
+        <div class="col-md-6 offset-md-3">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">What is DeveLanCacheUI?</h5>
+                </div>
+                <div class="card-body">
+                    <p>
+                        DeveLanCacheUI is a Web User Interface backed by a powerful Backend that lets you see what's happening inside your LanCache application. With intuitive visuals and easy-to-understand metrics, you can monitor, manage, and optimize your LanCache with ease.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">DeveLanCacheUI Backend</h5>
+                </div>
+                <div class="card-body">
+                    <p>
+                        The Backend is responsible for collecting and processing data from the LanCache, serving it to the frontend in a convenient and efficient manner.
+                    </p>
+                    <a href="https://github.com/devedse/DeveLanCacheUI_Backend/" class="btn btn-success" target="_blank">Check out the Backend GitHub Repository</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">DeveLanCacheUI Frontend</h5>
+                </div>
+                <div class="card-body">
+                    <p>
+                        The Frontend provides a user-friendly interface which visualizes and interacts with the data served by the Backend.
+                    </p>
+                    <a href="https://github.com/devedse/DeveLanCacheUI_Frontend/" class="btn btn-info" target="_blank">Check out the Frontend GitHub Repository</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
