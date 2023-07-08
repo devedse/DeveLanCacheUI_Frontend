@@ -3,7 +3,7 @@
 
 <div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="">DeveLanCacheUI_Frontend</a>
+        <a class="navbar-brand" href="">DeveLanCacheUI</a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -40,11 +40,40 @@
             </NavLink>
         </div>
     </nav>
+    <hr />
+    <div class="nav-item px-3">
+        <button class="btn btn-secondary" @onclick="ToggleTheme">Toggle Dark Mode</button>
+    </div>
     <div class="version-info px-3" style="position: absolute; bottom: 10px; color: white; font-weight: bold;">
         <small>Frontend Version: @FrontendVersion</small>
         <small>Backend Version: @BackendVersion</small>
     </div>
 </div>
+
+<style>
+    :root, [data-bs-theme="light"] {
+        --button-color: #007bff; /* Light theme button color (blue) */
+        --bs-primary: #007bff; /* Color for light theme border */
+    }
+
+    [data-bs-theme="dark"] {
+        --button-color: #6c757d; /* Dark theme button color (grey) */
+        --bs-primary: #6c757d; /* Color for dark theme border */
+    }
+
+    .btn-secondary {
+        background-color: var(--button-color);
+        border-color: var(--button-color);
+    }
+
+        .btn-secondary:focus {
+            box-shadow: 0 0 0 var(--bs-focus-width) rgba(var(--bs-focus-inner-color), var(--bs-focus-color-opacity)) !important;
+        }
+
+    hr {
+        border-top-color: rgb(173, 181, 189);
+    }
+</style>
 
 @code {
     private bool collapseNavMenu = true;
@@ -64,6 +93,10 @@
 
     protected override async Task OnInitializedAsync()
     {
+        string preferredColorScheme = await JSRuntime.InvokeAsync<string>("themeSwitcher.getPreferredColorScheme");
+        IsDarkMode = preferredColorScheme == "dark";
+        await JSRuntime.InvokeVoidAsync("themeSwitcher.switchTheme", preferredColorScheme);
+
         backendUrl = await JSRuntime.InvokeAsync<string>("eval", "window.ENV.BACKENDURL");
         if (!backendUrl.EndsWith("/"))
         {
@@ -94,5 +127,13 @@
         public string ApplicationName { get; set; }
         public string Version { get; set; }
         public string UpTime { get; set; }
+    }
+
+    private bool IsDarkMode { get; set; }
+
+    private async Task ToggleTheme()
+    {
+        IsDarkMode = !IsDarkMode;
+        await JSRuntime.InvokeVoidAsync("themeSwitcher.switchTheme", IsDarkMode ? "dark" : "light");
     }
 }

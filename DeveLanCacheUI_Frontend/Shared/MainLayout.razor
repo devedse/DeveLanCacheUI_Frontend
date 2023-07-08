@@ -7,29 +7,8 @@
     </div>
 
     <main>
-        <div class="top-row px-4">
-            <button class="btn btn-primary" @onclick="ToggleTheme">Toggle Dark Mode</button>
-        </div>
-
         <article class="content px-4">
             @Body
         </article>
     </main>
 </div>
-
-@code {
-    private bool IsDarkMode { get; set; }
-
-    protected override async Task OnInitializedAsync()
-    {
-        string preferredColorScheme = await JSRuntime.InvokeAsync<string>("themeSwitcher.getPreferredColorScheme");
-        IsDarkMode = preferredColorScheme == "dark";
-        await JSRuntime.InvokeVoidAsync("themeSwitcher.switchTheme", preferredColorScheme);
-    }
-
-    private async Task ToggleTheme()
-    {
-        IsDarkMode = !IsDarkMode;
-        await JSRuntime.InvokeVoidAsync("themeSwitcher.switchTheme", IsDarkMode ? "dark" : "light");
-    }
-}
