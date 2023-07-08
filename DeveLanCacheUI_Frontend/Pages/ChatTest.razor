@@ -1,7 +1,9 @@
 ﻿@page "/chattest"
+@using DeveLanCacheUI_Frontend.Services;
 @using Microsoft.AspNetCore.SignalR.Client
 @inject NavigationManager Navigation
 @inject IJSRuntime JSRuntime
+@inject BackendConnectionService _backendConnectionService
 @implements IAsyncDisposable
 
 <PageTitle>Chat Client</PageTitle>
@@ -53,20 +55,13 @@
     private string? userInput;
     private string? messageInput;
 
-    private string backendUrl;
-
     protected override async Task OnInitializedAsync()
     {
         userInput = GenerateIdentifier();
 
-        backendUrl = await JSRuntime.InvokeAsync<string>("eval", "window.ENV.BACKENDURL");
-        if (!backendUrl.EndsWith("/"))
-        {
-            backendUrl += "/";
-        }
-
+        var backendBaseUrl = await _backendConnectionService.GetBackendBaseUrlAsync();
         hubConnection = new HubConnectionBuilder()
-            .WithUrl($"{backendUrl}chathub")
+            .WithUrl($"{backendBaseUrl}chathub")
             .Build();
 
         hubConnection.On<string, string>("ReceiveMessage", async (user, message) =>

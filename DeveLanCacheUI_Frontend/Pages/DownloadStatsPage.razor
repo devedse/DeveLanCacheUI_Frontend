@@ -1,7 +1,9 @@
 ﻿@page "/downloadstats"
+@using DeveLanCacheUI_Frontend.Services;
 @using Microsoft.AspNetCore.SignalR.Client;
 @using DeveLanCacheUI_Frontend.ApiModels;
 @inject HttpClient Http
+@inject BackendConnectionService _backendConnectionService
 
 <PageTitle>Download Stats</PageTitle>
 
@@ -108,25 +110,17 @@
     private List<DownloadStats> clientDownloadStats = new List<DownloadStats>();
     private List<DownloadStats> serviceDownloadStats = new List<DownloadStats>();
 
-    private string backendUrl;
     private HubConnection hubConnection;
 
     private bool loading = true;
 
-    @inject IJSRuntime JSRuntime
-
     protected override async Task OnInitializedAsync()
     {
-        backendUrl = await JSRuntime.InvokeAsync<string>("eval", "window.ENV.BACKENDURL");
-        if (!backendUrl.EndsWith("/"))
-        {
-            backendUrl += "/";
-        }
-        Console.WriteLine($"Loaded Backend Url: {backendUrl}");
         await LoadData();
 
+        var backendBaseUrl = await _backendConnectionService.GetBackendBaseUrlAsync();
         hubConnection = new HubConnectionBuilder()
-            .WithUrl($"{backendUrl}lancachehub")
+            .WithUrl($"{backendBaseUrl}lancachehub")
             .Build();
 
         hubConnection.On("UpdateDownloadEvents", async () =>
@@ -142,12 +136,14 @@
     {
         loading = true;
         StateHasChanged();
-        var newClientStats = await Http.GetFromJsonAsync<DownloadStats[]>($"{backendUrl}DownloadStats/GetDownloadStatsPerClient");
+        var getDownloadStatsPerClientUrl = await _backendConnectionService.CreateBackendUrlAsync("DownloadStats/GetDownloadStatsPerClient");
+        var newClientStats = await Http.GetFromJsonAsync<DownloadStats[]>(getDownloadStatsPerClientUrl);
         if (newClientStats != null)
         {
             clientDownloadStats = newClientStats.ToList();
         }
-        var newServiceStats = await Http.GetFromJsonAsync<DownloadStats[]>($"{backendUrl}DownloadStats/GetDownloadStatsPerService");
+        var getDownloadStatsPerServiceUrl = await _backendConnectionService.CreateBackendUrlAsync("DownloadStats/GetDownloadStatsPerService");
+        var newServiceStats = await Http.GetFromJsonAsync<DownloadStats[]>(getDownloadStatsPerServiceUrl);
         if (newServiceStats != null)
         {
             serviceDownloadStats = newServiceStats.ToList();

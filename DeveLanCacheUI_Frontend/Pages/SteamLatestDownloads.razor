@@ -1,7 +1,9 @@
 ﻿@page "/steamlatestdownloads"
 @using DeveLanCacheUI_Frontend.ApiModels;
+@using DeveLanCacheUI_Frontend.Services;
 @using Microsoft.AspNetCore.SignalR.Client;
 @inject HttpClient Http
+@inject BackendConnectionService _backendConnectionService
 
 <PageTitle>Steam Latest Downloads</PageTitle>
 
@@ -103,25 +105,17 @@
 @code {
     private List<DownloadEvent> downloadEvents = new List<DownloadEvent>();
     private int loadedCount = 0;
-    private string backendUrl;
     private HubConnection hubConnection;
 
     private bool loading = true;
 
-    @inject IJSRuntime JSRuntime
-
     protected override async Task OnInitializedAsync()
     {
-        backendUrl = await JSRuntime.InvokeAsync<string>("eval", "window.ENV.BACKENDURL");
-        if (!backendUrl.EndsWith("/"))
-        {
-            backendUrl += "/";
-        }
-        Console.WriteLine($"Loaded Backend Url: {backendUrl}");
         await LoadMore();
 
+        var backendBaseUrl = await _backendConnectionService.GetBackendBaseUrlAsync();
         hubConnection = new HubConnectionBuilder()
-            .WithUrl($"{backendUrl}lancachehub")
+            .WithUrl($"{backendBaseUrl}lancachehub")
             .Build();
 
         hubConnection.On("UpdateDownloadEvents", async () =>
@@ -142,7 +136,8 @@
         loading = true;
         StateHasChanged();
 
-        var newEvents = await Http.GetFromJsonAsync<DownloadEvent[]>($"{backendUrl}DownloadEvents/GetFilteredBySkipAndCount?filter=steam&skip=0&count={loadedCount}&filter=steam");
+        var downloadEventsUrl = await _backendConnectionService.CreateBackendUrlAsync($"DownloadEvents/GetFilteredBySkipAndCount?filter=steam&skip=0&count={loadedCount}&filter=steam");
+        var newEvents = await Http.GetFromJsonAsync<DownloadEvent[]>(downloadEventsUrl);
         downloadEvents = newEvents.ToList();
         loading = false;
         StateHasChanged();
@@ -152,7 +147,8 @@
     {
         loading = true;
         StateHasChanged();
-        var newEvents = await Http.GetFromJsonAsync<DownloadEvent[]>($"{backendUrl}DownloadEvents/GetFilteredBySkipAndCount?skip={loadedCount}&count=40&filter=steam");
+        var downloadEventsUrl = await _backendConnectionService.CreateBackendUrlAsync($"DownloadEvents/GetFilteredBySkipAndCount?skip={loadedCount}&count=40&filter=steam");
+        var newEvents = await Http.GetFromJsonAsync<DownloadEvent[]>(downloadEventsUrl);
         if (newEvents != null)
         {
             downloadEvents.AddRange(newEvents);

@@ -1,6 +1,8 @@
 using DeveLanCacheUI_Frontend;
+using DeveLanCacheUI_Frontend.Services;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using Microsoft.JSInterop;
 
 namespace DeveLanCacheUI_Frontend
 {
@@ -13,6 +15,7 @@ namespace DeveLanCacheUI_Frontend
             builder.RootComponents.Add<HeadOutlet>("head::after");
 
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+            builder.Services.AddTransient<BackendConnectionService>();
 
             await builder.Build().RunAsync();
         }
