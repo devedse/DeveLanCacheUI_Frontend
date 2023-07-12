@@ -4,7 +4,12 @@
 		<TargetFramework>net7.0</TargetFramework>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
+		<ApplicationIcon>DeveLanCacheUI.ico</ApplicationIcon>
 	</PropertyGroup>
+
+	<ItemGroup>
+	  <Content Include="DeveLanCacheUI.ico" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="DeveCoolLib" Version="1.0.565" />
