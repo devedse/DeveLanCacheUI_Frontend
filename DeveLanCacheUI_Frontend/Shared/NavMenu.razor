@@ -1,5 +1,7 @@
-﻿@using static System.Net.WebRequestMethods;
+﻿@using DeveLanCacheUI_Frontend.Services;
+@using static System.Net.WebRequestMethods;
 @inject HttpClient Http
+@inject BackendConnectionService _backendConnectionService
 
 <div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
@@ -46,7 +48,8 @@
     </div>
     <div class="version-info px-3" style="position: absolute; bottom: 10px; color: white; font-weight: bold;">
         <small>Frontend Version: @FrontendVersion</small>
-        <small>Backend Version: @BackendVersion</small>
+        <small>Backend Version: @BackendStatus?.Version</small>
+        <small>Depot Version: @BackendStatus?.DepotVersion</small>
     </div>
 </div>
 
@@ -73,16 +76,18 @@
     hr {
         border-top-color: rgb(173, 181, 189);
     }
+
+    .version-info small {
+        display: block;
+    }
 </style>
 
 @code {
     private bool collapseNavMenu = true;
     private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
 
-    private string backendUrl;
-
     private string FrontendVersion { get; set; }
-    private string BackendVersion { get; set; }
+    private StatusModel BackendStatus { get; set; }
 
     @inject IJSRuntime JSRuntime
 
@@ -97,35 +102,29 @@
         IsDarkMode = preferredColorScheme == "dark";
         await JSRuntime.InvokeVoidAsync("themeSwitcher.switchTheme", preferredColorScheme);
 
-        backendUrl = await JSRuntime.InvokeAsync<string>("eval", "window.ENV.BACKENDURL");
-        if (!backendUrl.EndsWith("/"))
-        {
-            backendUrl += "/";
-        }
-        Console.WriteLine($"Loaded Backend Url: {backendUrl}");
-
-        FrontendVersion = GetVersion();
-
-        BackendVersion = await GetBackendVersion();
+        FrontendVersion = GetFrontendVersion();
+        BackendStatus = await GetBackendVersion();
     }
 
-    private string GetVersion()
+    private string GetFrontendVersion()
     {
         var assembly = System.Reflection.Assembly.GetExecutingAssembly();
         var version = assembly.GetName().Version.ToString();
         return version;
     }
 
-    private async Task<string> GetBackendVersion()
+    private async Task<StatusModel> GetBackendVersion()
     {
-        var status = await Http.GetFromJsonAsync<StatusModel>($"{backendUrl}Status");
-        return status.Version;
+        var statusUrl = await _backendConnectionService.CreateBackendUrlAsync("Status");
+        var status = await Http.GetFromJsonAsync<StatusModel>(statusUrl);
+        return status;
     }
 
     public class StatusModel
     {
         public string ApplicationName { get; set; }
         public string Version { get; set; }
+        public string? DepotVersion { get; set; }
         public string UpTime { get; set; }
     }
 
