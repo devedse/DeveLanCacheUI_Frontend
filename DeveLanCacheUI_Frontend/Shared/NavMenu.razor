@@ -2,6 +2,7 @@
 @using static System.Net.WebRequestMethods;
 @inject HttpClient Http
 @inject BackendConnectionService _backendConnectionService
+@inject Blazored.LocalStorage.ISyncLocalStorageService _localStorage
 
 <div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
@@ -47,7 +48,16 @@
     </nav>
     <hr />
     <div class="nav-item px-3">
-        <button class="btn btn-secondary" @onclick="ToggleTheme">Toggle Dark Mode</button>
+        <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="darkModeSwitch" @bind="IsDarkMode">
+            <label class="form-check-label light-label" for="darkModeSwitch">Dark Mode</label>
+        </div>
+    </div>
+    <div class="nav-item px-3">
+        <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="hashImagesSwitch" @bind="HashImagesEnabled">
+            <label class="form-check-label light-label" for="hashImagesSwitch">Hash Images</label>
+        </div>
     </div>
     <div class="version-info px-3" style="position: absolute; bottom: 10px; color: white; font-weight: bold;">
         <small>Frontend Version: @FrontendVersion</small>
@@ -57,24 +67,9 @@
 </div>
 
 <style>
-    :root, [data-bs-theme="light"] {
-        --button-color: #007bff; /* Light theme button color (blue) */
-        --bs-primary: #007bff; /* Color for light theme border */
+    .light-label {
+        color: #d7d7d7;
     }
-
-    [data-bs-theme="dark"] {
-        --button-color: #6c757d; /* Dark theme button color (grey) */
-        --bs-primary: #6c757d; /* Color for dark theme border */
-    }
-
-    .btn-secondary {
-        background-color: var(--button-color);
-        border-color: var(--button-color);
-    }
-
-        .btn-secondary:focus {
-            box-shadow: 0 0 0 var(--bs-focus-width) rgba(var(--bs-focus-inner-color), var(--bs-focus-color-opacity)) !important;
-        }
 
     hr {
         border-top-color: rgb(173, 181, 189);
@@ -101,9 +96,14 @@
 
     protected override async Task OnInitializedAsync()
     {
-        string preferredColorScheme = await JSRuntime.InvokeAsync<string>("themeSwitcher.getPreferredColorScheme");
-        IsDarkMode = preferredColorScheme == "dark";
-        await JSRuntime.InvokeVoidAsync("themeSwitcher.switchTheme", preferredColorScheme);
+        var localStorageDarkModeEnabled = _localStorage.GetItem<bool?>(LocalStorageField.DarkModeEnabled);
+        if (localStorageDarkModeEnabled == null)
+        {
+            string preferredColorScheme = await JSRuntime.InvokeAsync<string>("themeSwitcher.getPreferredColorScheme");
+            localStorageDarkModeEnabled = preferredColorScheme == "dark";
+        }
+        IsDarkMode = localStorageDarkModeEnabled.Value;
+        await SetDarkMode(IsDarkMode);
 
         FrontendVersion = GetFrontendVersion();
         BackendStatus = await GetBackendVersion();
@@ -131,11 +131,38 @@
         public string UpTime { get; set; }
     }
 
-    private bool IsDarkMode { get; set; }
-
-    private async Task ToggleTheme()
+    private bool _isDarkMode;
+    private bool IsDarkMode
     {
-        IsDarkMode = !IsDarkMode;
-        await JSRuntime.InvokeVoidAsync("themeSwitcher.switchTheme", IsDarkMode ? "dark" : "light");
+        get => _isDarkMode;
+        set
+        {
+            _isDarkMode = value;
+            _ = SetDarkMode(_isDarkMode);
+        }
+    }
+
+    private async Task SetDarkMode(bool enabled)
+    {
+        await JSRuntime.InvokeVoidAsync("themeSwitcher.switchTheme", enabled ? "dark" : "light");
+        _localStorage.SetItem(LocalStorageField.DarkModeEnabled, enabled);
+    }
+
+    private bool? _hashImagesEnabled;
+    private bool HashImagesEnabled
+    {
+        get
+        {
+            if (_hashImagesEnabled != null)
+            {
+                return _hashImagesEnabled.Value;
+            }
+            return _localStorage.GetItem<bool?>(LocalStorageField.HashImagesEnabled) ?? false;
+        }
+        set
+        {
+            _hashImagesEnabled = value;
+            _localStorage.SetItem(LocalStorageField.HashImagesEnabled, value);
+        }
     }
 }

@@ -4,6 +4,7 @@
 @using Microsoft.AspNetCore.SignalR.Client;
 @inject HttpClient Http
 @inject BackendConnectionService _backendConnectionService
+@inject Blazored.LocalStorage.ISyncLocalStorageService _localStorage
 
 <PageTitle>Steam Latest Downloads</PageTitle>
 
@@ -77,7 +78,17 @@
                         <span>@downloadEvent.DownloadIdentifierString</span>
                     }
                 </td>
-                <td>@downloadEvent.ClientIp</td>
+                <td style="text-align:center;">
+                    @if (backendBaseUrl != null && _localStorage.GetItem<bool>(LocalStorageField.HashImagesEnabled))
+                    {
+                        <div>@downloadEvent.ClientIp</div>
+                        <div><img src="@($"{backendBaseUrl}RoboHash/{downloadEvent.ClientIp}?format=png&sizeX=100&sizeY=100")" title="@downloadEvent.ClientIp" alt="Client Image" /></div>
+                    }
+                    else
+                    {
+                        @downloadEvent.ClientIp
+                    }
+                </td>
                 <td>
                     <progress max="100" value="@cacheHitPercent"></progress>
                     @($"{DeveCoolLib.Conversion.ValuesToStringHelper.BytesToString(downloadEvent.CacheHitBytes)} ({cacheHitPercent}%)")
@@ -109,11 +120,15 @@
 
     private bool loading = true;
 
+    public string? backendBaseUrl;
+
     protected override async Task OnInitializedAsync()
     {
+        _localStorage.Changed += (sender, eventArgs) => StateHasChanged();
+
         await LoadMore();
 
-        var backendBaseUrl = await _backendConnectionService.GetBackendBaseUrlAsync();
+        backendBaseUrl = await _backendConnectionService.GetBackendBaseUrlAsync();
         hubConnection = new HubConnectionBuilder()
             .WithUrl($"{backendBaseUrl}lancachehub")
             .Build();

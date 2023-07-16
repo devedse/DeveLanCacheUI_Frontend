@@ -4,6 +4,7 @@
 @using DeveLanCacheUI_Frontend.ApiModels;
 @inject HttpClient Http
 @inject BackendConnectionService _backendConnectionService
+@inject Blazored.LocalStorage.ISyncLocalStorageService _localStorage
 
 <PageTitle>Download Stats</PageTitle>
 
@@ -43,7 +44,17 @@
                     cacheMissPercent = Math.Round(((double)stats.TotalCacheMissBytes / (uberTotalSerivce)) * 100, 2);
                 }
                 <tr>
-                    <td>@stats.Identifier</td>
+                    <td style="text-align:center;">
+                        @if (backendBaseUrl != null && _localStorage.GetItem<bool>(LocalStorageField.HashImagesEnabled))
+                        {
+                            <div>@stats.Identifier</div>
+                            <div><img src="@($"{backendBaseUrl}RoboHash/{stats.Identifier}?format=png&sizeX=100&sizeY=100")" title="@stats.Identifier" alt="Client Image" /></div>
+                        }
+                        else
+                        {
+                            @stats.Identifier
+                        }
+                    </td>
                     <td>
                         <progress max="100" value="@cacheHitPercent"></progress>
                         @($"{DeveCoolLib.Conversion.ValuesToStringHelper.BytesToString(stats.TotalCacheHitBytes)} ({cacheHitPercent}%)")
@@ -114,11 +125,15 @@
 
     private bool loading = true;
 
+    public string? backendBaseUrl;
+
     protected override async Task OnInitializedAsync()
     {
+        _localStorage.Changed += (sender, eventArgs) => StateHasChanged();
+
         await LoadData();
 
-        var backendBaseUrl = await _backendConnectionService.GetBackendBaseUrlAsync();
+        backendBaseUrl = await _backendConnectionService.GetBackendBaseUrlAsync();
         hubConnection = new HubConnectionBuilder()
             .WithUrl($"{backendBaseUrl}lancachehub")
             .Build();
