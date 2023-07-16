@@ -22,3 +22,7 @@
 .compact-layout td {
     padding: 0px;
 }
+
+td {
+    vertical-align: middle;
+}
