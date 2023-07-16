@@ -4,5 +4,6 @@
     {
         public static string DarkModeEnabled = nameof(DarkModeEnabled);
         public static string HashImagesEnabled = nameof(HashImagesEnabled);
+        public static string CompactLayoutEnabled = nameof(CompactLayoutEnabled);
     }
 }

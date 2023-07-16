@@ -50,7 +50,7 @@
             var appHref = appId != 0 ? $"https://steamdb.info/app/{appId}/" : "";
             var depotHref = downloadIdentifierString != null && downloadEvent.CacheIdentifier == "steam" ? $"https://steamdb.info/depot/{downloadIdentifierString}/" : null;
             var imgUrl = appId != 0 ? $"https://cdn.cloudflare.steamstatic.com/steam/apps/{appId}/header.jpg" : "";
-            <tr>
+            <tr class="@(_localStorage.GetItem<bool>(LocalStorageField.CompactLayoutEnabled) ? "compact-layout" : "")">
                 <td>
                     @downloadEvent.CacheIdentifier
                 </td>
@@ -189,24 +189,5 @@
 }
 
 <style>
-    .status-ball {
-        display: inline-block;
-        vertical-align: middle;
-        width: 25px;
-        height: 25px;
-        border-radius: 50%;
-        margin-right: 10px;
-        border: 2px solid white;
-        box-shadow: 0 0 10px 0 rgba(255, 255, 255, .3);
-        background: radial-gradient(circle at 30% 30%, #0f0, #0a0);
-    }
 
-    .connected {
-        border-color: #0f0;
-    }
-
-    .disconnected {
-        border-color: #f00;
-        background: radial-gradient(circle at 30% 30%, #f00, #a00);
-    }
 </style>

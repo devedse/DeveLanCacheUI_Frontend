@@ -43,8 +43,8 @@
                     cacheHitPercent = Math.Round(((double)stats.TotalCacheHitBytes / (uberTotalSerivce)) * 100, 2);
                     cacheMissPercent = Math.Round(((double)stats.TotalCacheMissBytes / (uberTotalSerivce)) * 100, 2);
                 }
-                <tr>
-                    <td style="text-align:center;">
+                <tr class="@(_localStorage.GetItem<bool>(LocalStorageField.CompactLayoutEnabled) ? "compact-layout" : "")">
+                    <td>
                         @if (backendBaseUrl != null && _localStorage.GetItem<bool>(LocalStorageField.HashImagesEnabled))
                         {
                             <div>@stats.Identifier</div>
@@ -96,7 +96,7 @@
                     cacheHitPercent = Math.Round(((double)stats.TotalCacheHitBytes / (uberTotalClients)) * 100, 2);
                     cacheMissPercent = Math.Round(((double)stats.TotalCacheMissBytes / (uberTotalClients)) * 100, 2);
                 }
-                <tr>
+                <tr class="@(_localStorage.GetItem<bool>(LocalStorageField.CompactLayoutEnabled) ? "compact-layout" : "")">
                     <td>@stats.Identifier</td>
                     <td>
                         <progress max="100" value="@cacheHitPercent"></progress>
@@ -179,24 +179,5 @@
 }
 
 <style>
-    .status-ball {
-        display: inline-block;
-        vertical-align: middle;
-        width: 25px;
-        height: 25px;
-        border-radius: 50%;
-        margin-right: 10px;
-        border: 2px solid white;
-        box-shadow: 0 0 10px 0 rgba(255, 255, 255, .3);
-        background: radial-gradient(circle at 30% 30%, #0f0, #0a0);
-    }
 
-    .connected {
-        border-color: #0f0;
-    }
-
-    .disconnected {
-        border-color: #f00;
-        background: radial-gradient(circle at 30% 30%, #f00, #a00);
-    }
 </style>

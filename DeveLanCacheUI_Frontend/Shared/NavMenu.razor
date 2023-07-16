@@ -59,6 +59,12 @@
             <label class="form-check-label light-label" for="hashImagesSwitch">Hash Images</label>
         </div>
     </div>
+    <div class="nav-item px-3">
+        <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="compactLayoutSwitch" @bind="CompactLayoutEnabled">
+            <label class="form-check-label light-label" for="compactLayoutSwitch">Compact Layout</label>
+        </div>
+    </div>
     <div class="version-info px-3" style="position: absolute; bottom: 10px; color: white; font-weight: bold;">
         <small>Frontend Version: @FrontendVersion</small>
         <small>Backend Version: @BackendStatus?.Version</small>
@@ -163,6 +169,24 @@
         {
             _hashImagesEnabled = value;
             _localStorage.SetItem(LocalStorageField.HashImagesEnabled, value);
+        }
+    }
+
+    private bool? _compactLayoutEnabled;
+    private bool CompactLayoutEnabled
+    {
+        get
+        {
+            if (_compactLayoutEnabled != null)
+            {
+                return _compactLayoutEnabled.Value;
+            }
+            return _localStorage.GetItem<bool?>(LocalStorageField.CompactLayoutEnabled) ?? false;
+        }
+        set
+        {
+            _compactLayoutEnabled = value;
+            _localStorage.SetItem(LocalStorageField.CompactLayoutEnabled, value);
         }
     }
 }
