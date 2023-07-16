@@ -81,7 +81,17 @@
                         <span>@downloadEvent.DownloadIdentifierString</span>
                     }
                 </td>
-                <td>@downloadEvent.ClientIp</td>
+                <td>
+                    @if (backendUrl != null)
+                    {
+                        @downloadEvent.ClientIp
+                        <img src="@($"{backendUrl}RoboHash/{downloadEvent.ClientIp}?format=png&sizeX=100&sizeY=100")" title="@downloadEvent.ClientIp" alt="Client Image" />
+                    }
+                    else
+                    {
+                        @downloadEvent.ClientIp
+                    }
+                </td>
                 <td>
                     <progress max="100" value="@cacheHitPercent"></progress>
                     @($"{DeveCoolLib.Conversion.ValuesToStringHelper.BytesToString(downloadEvent.CacheHitBytes)} ({cacheHitPercent}%)")
@@ -113,6 +123,8 @@
 
     private bool loading = true;
 
+    public string? backendUrl;
+
     protected override async Task OnInitializedAsync()
     {
         await LoadMore();
@@ -121,6 +133,8 @@
         hubConnection = new HubConnectionBuilder()
             .WithUrl($"{backendBaseUrl}lancachehub")
             .Build();
+
+        backendUrl = backendBaseUrl;
 
         hubConnection.On("UpdateDownloadEvents", async () =>
         {
