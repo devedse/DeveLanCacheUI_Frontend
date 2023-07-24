@@ -32,6 +32,7 @@
             <th>Client</th>
             <th>Cache Hit</th>
             <th>Cache Miss</th>
+            <th>Progress</th>
         </tr>
     </thead>
     <tbody>
@@ -39,10 +40,15 @@
         {
             double cacheHitPercent = 0.0;
             double cacheMissPercent = 0.0;
+            double totalPercent = 0.0;
             if ((downloadEvent.CacheMissBytes + downloadEvent.CacheHitBytes) != 0)
             {
                 cacheHitPercent = Math.Round(((double)downloadEvent.CacheHitBytes / (downloadEvent.CacheMissBytes + downloadEvent.CacheHitBytes)) * 100, 2);
                 cacheMissPercent = Math.Round(((double)downloadEvent.CacheMissBytes / (downloadEvent.CacheMissBytes + downloadEvent.CacheHitBytes)) * 100, 2);
+                if (downloadEvent.TotalBytes != 0)
+                {
+                    totalPercent = Math.Round(((double)(downloadEvent.CacheMissBytes + downloadEvent.CacheHitBytes) / (double)downloadEvent.TotalBytes) * 100, 2);
+                }
             }
             var appId = downloadEvent.SteamDepot?.SteamAppId ?? 0;
             var downloadIdentifierString = downloadEvent.DownloadIdentifierString;
@@ -90,12 +96,34 @@
                     }
                 </td>
                 <td>
-                    <progress max="100" value="@cacheHitPercent"></progress>
-                    @($"{DeveCoolLib.Conversion.ValuesToStringHelper.BytesToString(downloadEvent.CacheHitBytes)} ({cacheHitPercent}%)")
+                    <progress max="100" value="@cacheHitPercent"></progress>                                        
+                    @{
+                        //If I don't add this @{ } around it there's a random space
+                        @($"{DeveCoolLib.Conversion.ValuesToStringHelper.BytesToString(downloadEvent.CacheHitBytes)} ({cacheHitPercent}%)")
+                    }
                 </td>
                 <td>
                     <progress max="100" value="@cacheMissPercent"></progress>
-                    @($"{DeveCoolLib.Conversion.ValuesToStringHelper.BytesToString(downloadEvent.CacheMissBytes)} ({cacheMissPercent}%)")
+                    @{
+                        //If I don't add this @{ } around it there's a random space
+                        @($"{DeveCoolLib.Conversion.ValuesToStringHelper.BytesToString(downloadEvent.CacheMissBytes)} ({cacheMissPercent}%)")
+                    }
+                </td>
+                <td>
+                    @if (downloadEvent.TotalBytes != 0)
+                    {
+                        <progress max="100" value="@totalPercent"></progress>
+
+                        var totalBytesString = DeveCoolLib.Conversion.ValuesToStringHelper.BytesToString((long)downloadEvent.TotalBytes);
+                        var downloadedBytesString = DeveCoolLib.Conversion.ValuesToStringHelper.BytesToString(downloadEvent.CacheMissBytes + downloadEvent.CacheHitBytes);
+                        var progressString = totalPercent < 100 ? $"{downloadedBytesString}/{totalBytesString} ({totalPercent}%)" : $"{totalBytesString} (100%)";
+
+                        @progressString
+                    }
+                    else
+                    {
+                        <span>Could not find Steam Manifest</span>
+                    }
                 </td>
             </tr>
         }
