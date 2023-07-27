@@ -161,7 +161,7 @@
         loading = true;
         StateHasChanged();
 
-        var downloadEventsUrl = await _backendConnectionService.CreateBackendUrlAsync($"DownloadEvents/GetBySkipAndCount?filter=steam&skip=0&count={loadedCount}");
+        var downloadEventsUrl = await _backendConnectionService.CreateBackendUrlAsync($"DownloadEvents/GetBySkipAndCount?filter=steam&skip=0&count={Math.Max(loadedCount, 40)}");
         var newEvents = await Http.GetFromJsonAsync<DownloadEvent[]>(downloadEventsUrl);
         downloadEvents = newEvents.ToList();
         loading = false;
