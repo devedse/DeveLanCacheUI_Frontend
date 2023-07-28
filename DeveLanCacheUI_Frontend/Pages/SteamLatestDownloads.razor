@@ -1,5 +1,6 @@
 ﻿@page "/steamlatestdownloads"
 @using DeveLanCacheUI_Frontend.ApiModels;
+@using DeveLanCacheUI_Frontend.Configuration;
 @using DeveLanCacheUI_Frontend.Services;
 @using Microsoft.AspNetCore.SignalR.Client;
 @inject HttpClient Http
@@ -88,7 +89,7 @@
                     @if (backendBaseUrl != null && _localStorage.GetItem<bool>(LocalStorageField.HashImagesEnabled))
                     {
                         <div>@downloadEvent.ClientIp</div>
-                        <div><img src="@($"{backendBaseUrl}RoboHash/{downloadEvent.ClientIp}?format=png&sizeX=100&sizeY=100")" title="@downloadEvent.ClientIp" alt="Client Image" /></div>
+                        <div><img src="@($"{backendBaseUrl}RoboHash/{downloadEvent.ClientIp}?format=png&sizeX={DeveLanCacheUIConstants.HashImageSize}&sizeY={DeveLanCacheUIConstants.HashImageSize}")" title="@downloadEvent.ClientIp" alt="Client Image" /></div>
                     }
                     else
                     {
