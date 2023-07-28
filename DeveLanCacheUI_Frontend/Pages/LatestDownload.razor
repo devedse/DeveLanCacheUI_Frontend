@@ -87,7 +87,7 @@
                     @if (backendBaseUrl != null && _localStorage.GetItem<bool>(LocalStorageField.HashImagesEnabled))
                     {
                         <div>@downloadEvent.ClientIp</div>
-                        <div><img src="@($"{backendBaseUrl}RoboHash/{downloadEvent.ClientIp}?format=png&sizeX={DeveLanCacheUIConstants.HashImageSize}&sizeY={DeveLanCacheUIConstants.HashImageSize}")" title="@downloadEvent.ClientIp" alt="Client Image" /></div>
+                        <div><img class="hashimage" src="@($"{backendBaseUrl}RoboHash/{downloadEvent.ClientIp}?format=png&sizeX={DeveLanCacheUIConstants.HashImageSize}&sizeY={DeveLanCacheUIConstants.HashImageSize}")" title="@downloadEvent.ClientIp" alt="Client Image" /></div>
                     }
                     else
                     {

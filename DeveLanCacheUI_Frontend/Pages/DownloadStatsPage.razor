@@ -49,7 +49,7 @@
                         @if (backendBaseUrl != null && _localStorage.GetItem<bool>(LocalStorageField.HashImagesEnabled))
                         {
                             <div>@stats.Identifier</div>
-                            <div><img src="@($"{backendBaseUrl}RoboHash/{stats.Identifier}?format=png&sizeX={DeveLanCacheUIConstants.HashImageSize}&sizeY={DeveLanCacheUIConstants.HashImageSize}")" title="@stats.Identifier" alt="Client Image" /></div>
+                            <div><img class="hashimage" src="@($"{backendBaseUrl}RoboHash/{stats.Identifier}?format=png&sizeX={DeveLanCacheUIConstants.HashImageSize}&sizeY={DeveLanCacheUIConstants.HashImageSize}")" title="@stats.Identifier" alt="Client Image" /></div>
                         }
                         else
                         {

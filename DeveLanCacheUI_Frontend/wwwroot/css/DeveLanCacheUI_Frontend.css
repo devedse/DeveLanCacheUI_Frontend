@@ -30,3 +30,8 @@ td {
 progress {
     margin-right: 5px;
 }
+
+.hashimage {
+    width: 100px;
+    height: 100px;
+}
