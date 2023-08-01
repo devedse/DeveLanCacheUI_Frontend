@@ -61,7 +61,7 @@
 
         var backendBaseUrl = await _backendConnectionService.GetBackendBaseUrlAsync();
         hubConnection = new HubConnectionBuilder()
-            .WithUrl($"{backendBaseUrl}chathub")
+            .WithUrl(Navigation.ToAbsoluteUri($"{backendBaseUrl}chathub"))
             .Build();
 
         hubConnection.On<string, string>("ReceiveMessage", async (user, message) =>

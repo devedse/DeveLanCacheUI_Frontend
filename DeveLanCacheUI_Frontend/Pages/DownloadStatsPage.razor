@@ -6,6 +6,7 @@
 @inject HttpClient Http
 @inject BackendConnectionService _backendConnectionService
 @inject Blazored.LocalStorage.ISyncLocalStorageService _localStorage
+@inject NavigationManager Navigation
 
 <PageTitle>Download Stats</PageTitle>
 
@@ -136,7 +137,7 @@
 
         backendBaseUrl = await _backendConnectionService.GetBackendBaseUrlAsync();
         hubConnection = new HubConnectionBuilder()
-            .WithUrl($"{backendBaseUrl}lancachehub")
+            .WithUrl(Navigation.ToAbsoluteUri($"{backendBaseUrl}lancachehub"))
             .Build();
 
         hubConnection.On("UpdateDownloadEvents", async () =>

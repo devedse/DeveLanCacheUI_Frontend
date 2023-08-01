@@ -124,9 +124,21 @@
 
     private async Task<StatusModel> GetBackendVersion()
     {
-        var statusUrl = await _backendConnectionService.CreateBackendUrlAsync("Status");
-        var status = await Http.GetFromJsonAsync<StatusModel>(statusUrl);
-        return status;
+        try
+        {
+            var statusUrl = await _backendConnectionService.CreateBackendUrlAsync("Status");
+            var status = await Http.GetFromJsonAsync<StatusModel>(statusUrl);
+            return status;
+        }
+        catch (Exception ex)
+        {
+            return new StatusModel()
+            {
+                Version = "???",
+                DepotVersion = "???",
+                UpTime = "0"
+            };
+        }
     }
 
     public class StatusModel
