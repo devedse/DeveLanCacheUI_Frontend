@@ -4,6 +4,8 @@ on: push
 
 jobs:
   generate_version_number:
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     outputs:
       build_number: ${{ github.ref == 'refs/heads/master' && steps.buildnumber.outputs.build_number || 1 }}
@@ -11,7 +13,7 @@ jobs:
     - name: Generate build number
       if: github.ref == 'refs/heads/master'
       id: buildnumber
-      uses: einaregilsson/build-number@v3
+      uses: onyxmueller/build-tag-number@v1
       with:
         token: ${{secrets.github_token}}
 
