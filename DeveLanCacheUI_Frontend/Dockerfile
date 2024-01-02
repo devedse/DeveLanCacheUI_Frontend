@@ -6,7 +6,7 @@ WORKDIR /app
 EXPOSE 80
 EXPOSE 443
 
-FROM --platform=linux/amd64 mcr.microsoft.com/dotnet/sdk:7.0 AS build
+FROM --platform=linux/amd64 mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 COPY ["DeveLanCacheUI_Frontend/DeveLanCacheUI_Frontend.csproj", "DeveLanCacheUI_Frontend/"]
 RUN dotnet restore "DeveLanCacheUI_Frontend/DeveLanCacheUI_Frontend.csproj"
