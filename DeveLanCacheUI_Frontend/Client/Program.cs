@@ -1,11 +1,7 @@
 using Blazored.LocalStorage;
-using DeveLanCacheUI_Frontend;
 using DeveLanCacheUI_Frontend.Services;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using Microsoft.JSInterop;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace DeveLanCacheUI_Frontend
 {
