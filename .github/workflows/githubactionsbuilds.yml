@@ -101,7 +101,7 @@ jobs:
     - name: Run CodeCov
       uses: codecov/codecov-action@v4
       with:
-        directory: ./DeveLanCacheUI_Backend.Tests/TestResults
+        directory: ./DeveLanCacheUI_Frontend.Tests/TestResults
         fail_ci_if_error: true # optional (default = false)
         verbose: true # optional (default = false)
       env:
