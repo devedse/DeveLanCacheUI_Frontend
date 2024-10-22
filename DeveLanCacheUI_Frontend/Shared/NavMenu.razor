@@ -156,9 +156,8 @@
         public string Version { get; set; }
         public string? SteamDepotVersion { get; set; }
         public string? SteamChangeNumber { get; set; }
+        public string UpTime { get; set; }
     }
-    public string UpTime { get; set; }
-}
 
     private bool _isDarkMode;
     private bool IsDarkMode
@@ -186,32 +185,31 @@
             {
                 return _hashImagesEnabled.Value;
             }
-            return _localStorage.GetItem<bool?>
-    (LocalStorageField.HashImagesEnabled) ?? false;
-    }
-    set
-    {
-    _hashImagesEnabled = value;
-    _localStorage.SetItem(LocalStorageField.HashImagesEnabled, value);
-    }
+            return _localStorage.GetItem<bool?>(LocalStorageField.HashImagesEnabled) ?? false;
+        }
+        set
+        {
+            _hashImagesEnabled = value;
+            _localStorage.SetItem(LocalStorageField.HashImagesEnabled, value);
+        }
     }
 
     private bool? _compactLayoutEnabled;
     private bool CompactLayoutEnabled
     {
-    get
-    {
-    if (_compactLayoutEnabled != null)
-    {
-    return _compactLayoutEnabled.Value;
-    }
-    return _localStorage.GetItem<bool?>
-        (LocalStorageField.CompactLayoutEnabled) ?? false;
+        get
+        {
+            if (_compactLayoutEnabled != null)
+            {
+                return _compactLayoutEnabled.Value;
+            }
+            return _localStorage.GetItem<bool?>
+                (LocalStorageField.CompactLayoutEnabled) ?? false;
         }
         set
         {
-        _compactLayoutEnabled = value;
-        _localStorage.SetItem(LocalStorageField.CompactLayoutEnabled, value);
+            _compactLayoutEnabled = value;
+            _localStorage.SetItem(LocalStorageField.CompactLayoutEnabled, value);
         }
-        }
-        }
+    }
+}
