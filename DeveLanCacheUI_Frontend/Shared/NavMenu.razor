@@ -70,12 +70,12 @@
         <small>Backend Version: @BackendStatus?.Version</small>
         @if (!string.IsNullOrEmpty(BackendStatus?.SteamDepotVersion))
         {
-            <small>Depot Version: @BackendStatus?.SteamDepotVersion</small>
+            <small>Steam Depot Version: @BackendStatus?.SteamDepotVersion</small>
         }
 
         @if (BackendStatus?.SteamChangeNumber != null)
         {
-            <small>Change Number: @BackendStatus?.SteamChangeNumber</small>
+            <small>Steam Change Number: @BackendStatus?.SteamChangeNumber</small>
         }
     </div>
 </div>
