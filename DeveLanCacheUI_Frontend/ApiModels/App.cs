@@ -2,7 +2,7 @@
 {
     public class App
     {
-        public int appid { get; set; }
-        public string name { get; set; }
+        public required int appid { get; set; }
+        public required string name { get; set; }
     }
 }
