@@ -3,6 +3,7 @@
 @using DeveLanCacheUI_Frontend.Services;
 @using Microsoft.AspNetCore.SignalR.Client;
 @using DeveLanCacheUI_Frontend.ApiModels;
+@using System.Globalization;
 @inject HttpClient Http
 @inject BackendConnectionService _backendConnectionService
 @inject Blazored.LocalStorage.ISyncLocalStorageService _localStorage
@@ -58,11 +59,11 @@
                         }
                     </td>
                     <td>
-                        <progress max="100" value="@cacheHitPercent"></progress>
+                        <progress max="100" value="@(cacheHitPercent.ToString(CultureInfo.InvariantCulture))"></progress>
                         @($"{DeveCoolLib.Conversion.ValuesToStringHelper.BytesToString(stats.TotalCacheHitBytes)} ({cacheHitPercent}%)")
                     </td>
                     <td>
-                        <progress max="100" value="@cacheMissPercent"></progress>
+                        <progress max="100" value="@(cacheMissPercent.ToString(CultureInfo.InvariantCulture))"></progress>
                         @($"{DeveCoolLib.Conversion.ValuesToStringHelper.BytesToString(stats.TotalCacheMissBytes)} ({cacheMissPercent}%)")
                     </td>
                 </tr>
@@ -101,11 +102,11 @@
                 <tr class="@(_localStorage.GetItem<bool>(LocalStorageField.CompactLayoutEnabled) ? "compact-layout" : "")">
                     <td>@stats.Identifier</td>
                     <td>
-                        <progress max="100" value="@cacheHitPercent"></progress>
+                        <progress max="100" value="@(cacheHitPercent.ToString(CultureInfo.InvariantCulture))"></progress>
                         @($"{DeveCoolLib.Conversion.ValuesToStringHelper.BytesToString(stats.TotalCacheHitBytes)} ({cacheHitPercent}%)")
                     </td>
                     <td>
-                        <progress max="100" value="@cacheMissPercent"></progress>
+                        <progress max="100" value="@(cacheMissPercent.ToString(CultureInfo.InvariantCulture))"></progress>
                         @($"{DeveCoolLib.Conversion.ValuesToStringHelper.BytesToString(stats.TotalCacheMissBytes)} ({cacheMissPercent}%)")
                     </td>
                 </tr>

@@ -3,6 +3,7 @@
 @using DeveLanCacheUI_Frontend.Configuration;
 @using DeveLanCacheUI_Frontend.Services;
 @using Microsoft.AspNetCore.SignalR.Client;
+@using System.Globalization;
 @inject HttpClient Http
 @inject BackendConnectionService _backendConnectionService
 @inject Blazored.LocalStorage.ISyncLocalStorageService _localStorage
@@ -98,14 +99,14 @@
                     }
                 </td>
                 <td>
-                    <progress max="100" value="@cacheHitPercent"></progress>                                        
+                    <progress max="100" value="@(cacheHitPercent.ToString(CultureInfo.InvariantCulture))"></progress>
                     @{
                         //If I don't add this @{ } around it there's a random space
                         @($"{DeveCoolLib.Conversion.ValuesToStringHelper.BytesToString(downloadEvent.CacheHitBytes)} ({cacheHitPercent}%)")
                     }
                 </td>
                 <td>
-                    <progress max="100" value="@cacheMissPercent"></progress>
+                    <progress max="100" value="@(cacheMissPercent.ToString(CultureInfo.InvariantCulture))"></progress>
                     @{
                         //If I don't add this @{ } around it there's a random space
                         @($"{DeveCoolLib.Conversion.ValuesToStringHelper.BytesToString(downloadEvent.CacheMissBytes)} ({cacheMissPercent}%)")
@@ -114,7 +115,7 @@
                 <td>
                     @if (downloadEvent.TotalBytes != 0)
                     {
-                        <progress max="100" value="@totalPercent"></progress>
+                        <progress max="100" value="@(totalPercent.ToString(CultureInfo.InvariantCulture))"></progress>
 
                         var totalBytesString = DeveCoolLib.Conversion.ValuesToStringHelper.BytesToString((long)downloadEvent.TotalBytes);
                         var downloadedBytesString = DeveCoolLib.Conversion.ValuesToStringHelper.BytesToString(downloadEvent.CacheMissBytes + downloadEvent.CacheHitBytes);
