@@ -11,7 +11,7 @@
 
 <PageTitle>Download Stats</PageTitle>
 
-<h1>
+<h1 id="client-download-stats">
     Download Stats
     <span class="status-ball @(hubConnection?.State == HubConnectionState.Connected ? "connected" : "disconnected")"
           title="@(hubConnection?.State == HubConnectionState.Connected ? "Connected" : "Disconnected")">
@@ -76,7 +76,7 @@
         }
     </tbody>
 </table>
-<h2>Service Download Stats</h2>
+<h2 id="service-download-stats">Service Download Stats</h2>
 <table id="serviceStats" class="table">
     <thead>
         <tr>
