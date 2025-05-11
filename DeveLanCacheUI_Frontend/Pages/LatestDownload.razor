@@ -36,6 +36,7 @@
             <th>Client</th>
             <th>Cache Hit</th>
             <th>Cache Miss</th>
+            <th>Progress</th>
         </tr>
     </thead>
     <tbody>
@@ -43,12 +44,17 @@
         {
             double cacheHitPercent = 0.0;
             double cacheMissPercent = 0.0;
+            double totalPercent = 0.0;
             if ((downloadEvent.CacheMissBytes + downloadEvent.CacheHitBytes) != 0)
             {
                 cacheHitPercent = Math.Round(((double)downloadEvent.CacheHitBytes / (downloadEvent.CacheMissBytes + downloadEvent.CacheHitBytes)) * 100, 2);
                 cacheMissPercent = Math.Round(((double)downloadEvent.CacheMissBytes / (downloadEvent.CacheMissBytes + downloadEvent.CacheHitBytes)) * 100, 2);
+                if (downloadEvent.DownloadInfo?.TotalBytes != null && downloadEvent.DownloadInfo?.TotalBytes != 0)
+                {
+                    totalPercent = Math.Round(((double)(downloadEvent.CacheMissBytes + downloadEvent.CacheHitBytes) / (double)downloadEvent.DownloadInfo?.TotalBytes) * 100, 2);
+                }
             }
-            @*       var appId = downloadEvent.SteamDepot?.SteamAppId ?? 0;
+            @*var appId = downloadEvent.SteamDepot?.SteamAppId ?? 0;
             var downloadIdentifierString = downloadEvent.DownloadIdentifierString;
             var appHref = appId != 0 ? $"https://steamdb.info/app/{appId}/" : "";
             var depotHref = downloadIdentifierString != null && downloadEvent.CacheIdentifier == "steam" ? $"https://steamdb.info/depot/{downloadIdentifierString}/" : null;
@@ -63,18 +69,24 @@
                 <td>
                     @if (downloadEvent.DownloadInfo != null)
                     {
-                        <a href="@downloadEvent.DownloadInfo?.AppUrl ?? null" target="_blank">
-                            <img src="@downloadEvent.DownloadInfo?.AppImageUrl" style="width:200px;height:auto;" />
-                            <span>@(downloadEvent.DownloadInfo?.Name ?? "unknown")</span>
+                        <a href="@(downloadEvent.DownloadInfo?.AppUrl ?? null)" target="_blank">
+                            @if (downloadEvent.DownloadInfo?.AppImageUrl != null)
+                            {
+                                <img src="@downloadEvent.DownloadInfo?.AppImageUrl" style="width:200px;height:auto;" onerror="this.style.display='none'" />
+                            }
+                            <p>@(downloadEvent.DownloadInfo?.Name ?? "unknown")</p>
                         </a>
                     }
                 </td>
                 <td>
                     @if (downloadEvent.DownloadInfo != null)
                     {
-                        <a href="@downloadEvent.DownloadInfo?.DownloadIdentifierUrl ?? null" target="_blank">
-                            <img src="@downloadEvent.DownloadInfo?.DownloadIdentifierImageUrl" style="width:200px;height:auto;" />
-                            <span>@(downloadEvent.DownloadInfo?.DownloadIdentifier ?? "unknown")</span>
+                        <a href="@(downloadEvent.DownloadInfo?.DownloadIdentifierUrl ?? null)" target="_blank">
+                            @if (downloadEvent.DownloadInfo?.DownloadIdentifierImageUrl != null)
+                            {
+                                <img src="@downloadEvent.DownloadInfo?.DownloadIdentifierImageUrl" style="width:200px;height:auto;" onerror="this.style.display='none'" />
+                            }
+                            <p>@(downloadEvent.DownloadInfo?.DownloadIdentifier ?? "unknown")</p>
                         </a>
                     }
                 </td>
@@ -102,6 +114,22 @@
                         //If I don't add this @{ } around it there's a random space
                         @($"{DeveCoolLib.Conversion.ValuesToStringHelper.BytesToString(downloadEvent.CacheMissBytes)} ({cacheMissPercent}%)")
                     }
+                </td>
+                <td>
+                        @if (downloadEvent.DownloadInfo?.TotalBytes is not null or 0)
+                        {
+                            <progress max="100" value="@(totalPercent.ToString(CultureInfo.InvariantCulture))"></progress>
+
+                            var totalBytesString = DeveCoolLib.Conversion.ValuesToStringHelper.BytesToString((long)downloadEvent.DownloadInfo?.TotalBytes!);
+                            var downloadedBytesString = DeveCoolLib.Conversion.ValuesToStringHelper.BytesToString(downloadEvent.CacheMissBytes + downloadEvent.CacheHitBytes);
+                            var progressString = totalPercent < 100 ? $"{downloadedBytesString}/{totalBytesString} ({totalPercent}%)" : $"{downloadedBytesString} (100%)";
+
+                            @progressString
+                        }
+                        else
+                        {
+                        <span>Could not find Manifest</span>
+                        }
                 </td>
             </tr>
         }

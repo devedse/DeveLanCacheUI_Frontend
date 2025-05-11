@@ -66,7 +66,10 @@
                     @if (downloadEvent.DownloadInfo != null)
                     {
                         <a href="@(downloadEvent.DownloadInfo?.AppUrl ?? null)" target="_blank">
-                            <img src="@downloadEvent.DownloadInfo?.AppImageUrl" style="width:200px;height:auto;" />
+                            @if (downloadEvent.DownloadInfo?.AppImageUrl != null)
+                            {
+                                <img src="@downloadEvent.DownloadInfo?.AppImageUrl" style="width:200px;height:auto;" onerror="this.style.display='none'" />
+                            }
                             <p>@(downloadEvent.DownloadInfo?.Name ?? "unknown")</p>
                         </a>
                     }
@@ -77,9 +80,9 @@
                         <a href="@(downloadEvent.DownloadInfo?.DownloadIdentifierUrl ?? null)" target="_blank">
                             @if (downloadEvent.DownloadInfo?.DownloadIdentifierImageUrl != null)
                             {
-                                <img src="@downloadEvent.DownloadInfo?.DownloadIdentifierImageUrl" style="width:200px;height:auto;" />
+                                <img src="@downloadEvent.DownloadInfo?.DownloadIdentifierImageUrl" style="width:200px;height:auto;" onerror="this.style.display='none'" />
                             }
-                            <span>@(downloadEvent.DownloadInfo?.DownloadIdentifier ?? "unknown")</span>
+                            <p>@(downloadEvent.DownloadInfo?.DownloadIdentifier ?? "unknown")</p>
                         </a>
                     }
                 </td>
@@ -121,7 +124,7 @@
                     }
                     else
                     {
-                        <span>Could not find Steam Manifest</span>
+                        <span>Could not find Manifest</span>
                     }
                 </td>
             </tr>
