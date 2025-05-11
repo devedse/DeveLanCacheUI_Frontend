@@ -14,7 +14,7 @@
 <h1>
     Steam Latest Downloads
     <span class="status-ball @(hubConnection?.State == HubConnectionState.Connected ? "connected" : "disconnected")"
-          title="@(hubConnection?.State == HubConnectionState.Connected ? "Connected" : "Disconnected")">
+    title="@(hubConnection?.State == HubConnectionState.Connected ? "Connected" : "Disconnected")">
     </span>
     @if (loading)
     {
@@ -48,43 +48,39 @@
             {
                 cacheHitPercent = Math.Round(((double)downloadEvent.CacheHitBytes / (downloadEvent.CacheMissBytes + downloadEvent.CacheHitBytes)) * 100, 2);
                 cacheMissPercent = Math.Round(((double)downloadEvent.CacheMissBytes / (downloadEvent.CacheMissBytes + downloadEvent.CacheHitBytes)) * 100, 2);
-                if (downloadEvent.TotalBytes != 0)
+                if (downloadEvent.DownloadInfo?.TotalBytes != null && downloadEvent.DownloadInfo?.TotalBytes != 0)
                 {
-                    totalPercent = Math.Round(((double)(downloadEvent.CacheMissBytes + downloadEvent.CacheHitBytes) / (double)downloadEvent.TotalBytes) * 100, 2);
+                    totalPercent = Math.Round(((double)(downloadEvent.CacheMissBytes + downloadEvent.CacheHitBytes) / (double)downloadEvent.DownloadInfo?.TotalBytes) * 100, 2);
                 }
             }
-            var appId = downloadEvent.SteamDepot?.SteamAppId ?? 0;
+            @*var appId = downloadEvent.SteamDepot?.SteamAppId ?? 0;
             var downloadIdentifierString = downloadEvent.DownloadIdentifierString;
             var appHref = appId != 0 ? $"https://steamdb.info/app/{appId}/" : "";
             var depotHref = downloadIdentifierString != null && downloadEvent.CacheIdentifier == "steam" ? $"https://steamdb.info/depot/{downloadIdentifierString}/" : null;
-            var imgUrl = appId != 0 ? $"https://cdn.cloudflare.steamstatic.com/steam/apps/{appId}/header.jpg" : "";
+            var imgUrl = appId != 0 ? $"https://cdn.cloudflare.steamstatic.com/steam/apps/{appId}/header.jpg" : ""; *@
             <tr class="@(_localStorage.GetItem<bool>(LocalStorageField.CompactLayoutEnabled) ? "compact-layout" : "")">
                 <td>
                     @downloadEvent.CreatedAt - @downloadEvent.LastUpdatedAt
                 </td>
                 <td>
-                    @if (appId != 0)
+                    @if (downloadEvent.DownloadInfo != null)
                     {
-                        <a href="@appHref" target="_blank">
-                            <img src="@imgUrl" style="width:200px;height:auto;" />
-                            @*@(downloadEvent.SteamDepot?.SteamApp?.AppName ?? "unknown")*@
+                        <a href="@(downloadEvent.DownloadInfo?.AppUrl ?? null)" target="_blank">
+                            <img src="@downloadEvent.DownloadInfo?.AppImageUrl" style="width:200px;height:auto;" />
+                            <p>@(downloadEvent.DownloadInfo?.Name ?? "unknown")</p>
                         </a>
-                    }
-                    else
-                    {
-                        <span>@(downloadEvent.SteamDepot?.SteamApp?.name ?? "unknown")</span>
                     }
                 </td>
                 <td>
-                    @if (depotHref != null)
+                    @if (downloadEvent.DownloadInfo != null)
                     {
-                        <a href="@depotHref" target="_blank">
-                            @downloadEvent.DownloadIdentifierString
+                        <a href="@(downloadEvent.DownloadInfo?.DownloadIdentifierUrl ?? null)" target="_blank">
+                            @if (downloadEvent.DownloadInfo?.DownloadIdentifierImageUrl != null)
+                            {
+                                <img src="@downloadEvent.DownloadInfo?.DownloadIdentifierImageUrl" style="width:200px;height:auto;" />
+                            }
+                            <span>@(downloadEvent.DownloadInfo?.DownloadIdentifier ?? "unknown")</span>
                         </a>
-                    }
-                    else
-                    {
-                        <span>@downloadEvent.DownloadIdentifierString</span>
                     }
                 </td>
                 <td style="text-align:center;">
@@ -113,11 +109,11 @@
                     }
                 </td>
                 <td>
-                    @if (downloadEvent.TotalBytes != 0)
+                    @if (downloadEvent.DownloadInfo?.TotalBytes is not null or 0)
                     {
                         <progress max="100" value="@(totalPercent.ToString(CultureInfo.InvariantCulture))"></progress>
 
-                        var totalBytesString = DeveCoolLib.Conversion.ValuesToStringHelper.BytesToString((long)downloadEvent.TotalBytes);
+                        var totalBytesString = DeveCoolLib.Conversion.ValuesToStringHelper.BytesToString((long)downloadEvent.DownloadInfo?.TotalBytes!);
                         var downloadedBytesString = DeveCoolLib.Conversion.ValuesToStringHelper.BytesToString(downloadEvent.CacheMissBytes + downloadEvent.CacheHitBytes);
                         var progressString = totalPercent < 100 ? $"{downloadedBytesString}/{totalBytesString} ({totalPercent}%)" : $"{downloadedBytesString} (100%)";
 

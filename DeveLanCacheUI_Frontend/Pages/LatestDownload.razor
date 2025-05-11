@@ -48,11 +48,11 @@
                 cacheHitPercent = Math.Round(((double)downloadEvent.CacheHitBytes / (downloadEvent.CacheMissBytes + downloadEvent.CacheHitBytes)) * 100, 2);
                 cacheMissPercent = Math.Round(((double)downloadEvent.CacheMissBytes / (downloadEvent.CacheMissBytes + downloadEvent.CacheHitBytes)) * 100, 2);
             }
-            var appId = downloadEvent.SteamDepot?.SteamAppId ?? 0;
+            @*       var appId = downloadEvent.SteamDepot?.SteamAppId ?? 0;
             var downloadIdentifierString = downloadEvent.DownloadIdentifierString;
             var appHref = appId != 0 ? $"https://steamdb.info/app/{appId}/" : "";
             var depotHref = downloadIdentifierString != null && downloadEvent.CacheIdentifier == "steam" ? $"https://steamdb.info/depot/{downloadIdentifierString}/" : null;
-            var imgUrl = appId != 0 ? $"https://cdn.cloudflare.steamstatic.com/steam/apps/{appId}/header.jpg" : "";
+            var imgUrl = appId != 0 ? $"https://cdn.cloudflare.steamstatic.com/steam/apps/{appId}/header.jpg" : ""; *@
             <tr class="@(_localStorage.GetItem<bool>(LocalStorageField.CompactLayoutEnabled) ? "compact-layout" : "")">
                 <td>
                     @downloadEvent.CacheIdentifier
@@ -61,28 +61,21 @@
                     @downloadEvent.CreatedAt - @downloadEvent.LastUpdatedAt
                 </td>
                 <td>
-                    @if (appId != 0)
+                    @if (downloadEvent.DownloadInfo != null)
                     {
-                        <a href="@appHref" target="_blank">
-                            <img src="@imgUrl" style="width:200px;height:auto;" />
-                            @*@(downloadEvent.SteamDepot?.SteamApp?.AppName ?? "unknown")*@
+                        <a href="@downloadEvent.DownloadInfo?.AppUrl ?? null" target="_blank">
+                            <img src="@downloadEvent.DownloadInfo?.AppImageUrl" style="width:200px;height:auto;" />
+                            <span>@(downloadEvent.DownloadInfo?.Name ?? "unknown")</span>
                         </a>
-                    }
-                    else
-                    {
-                        <span>@(downloadEvent.SteamDepot?.SteamApp?.name ?? "unknown")</span>
                     }
                 </td>
                 <td>
-                    @if (depotHref != null)
+                    @if (downloadEvent.DownloadInfo != null)
                     {
-                        <a href="@depotHref" target="_blank">
-                            @downloadEvent.DownloadIdentifierString
+                        <a href="@downloadEvent.DownloadInfo?.DownloadIdentifierUrl ?? null" target="_blank">
+                            <img src="@downloadEvent.DownloadInfo?.DownloadIdentifierImageUrl" style="width:200px;height:auto;" />
+                            <span>@(downloadEvent.DownloadInfo?.DownloadIdentifier ?? "unknown")</span>
                         </a>
-                    }
-                    else
-                    {
-                        <span>@downloadEvent.DownloadIdentifierString</span>
                     }
                 </td>
                 <td style="text-align:center;">

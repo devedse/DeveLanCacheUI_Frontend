@@ -3,7 +3,7 @@ using DeveLanCacheUI_Frontend.Services;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 
-namespace DeveLanCacheUI_Frontend
+namespace DeveLanCacheUI_Frontend.Client
 {
     public class Program
     {
