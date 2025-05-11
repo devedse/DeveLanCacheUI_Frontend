@@ -5,7 +5,7 @@
         public int Id { get; set; }
 
         //steam/epicgames/wsus/epicgames
-        public string CacheIdentifier { get; set; }
+        public required string CacheIdentifier { get; set; }
 
         public uint? DownloadIdentifier { get; set; }
         public string? DownloadIdentifierString { get; set; }

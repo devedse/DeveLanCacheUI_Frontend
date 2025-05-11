@@ -49,16 +49,12 @@
             {
                 cacheHitPercent = Math.Round(((double)downloadEvent.CacheHitBytes / (downloadEvent.CacheMissBytes + downloadEvent.CacheHitBytes)) * 100, 2);
                 cacheMissPercent = Math.Round(((double)downloadEvent.CacheMissBytes / (downloadEvent.CacheMissBytes + downloadEvent.CacheHitBytes)) * 100, 2);
-                if (downloadEvent.DownloadInfo?.TotalBytes != null && downloadEvent.DownloadInfo?.TotalBytes != 0)
+                var totalBytes = downloadEvent.DownloadInfo?.TotalBytes;
+                if (totalBytes is not null and not 0)
                 {
-                    totalPercent = Math.Round(((double)(downloadEvent.CacheMissBytes + downloadEvent.CacheHitBytes) / (double)downloadEvent.DownloadInfo?.TotalBytes) * 100, 2);
+                    totalPercent = Math.Round(((double)(downloadEvent.CacheMissBytes + downloadEvent.CacheHitBytes) / totalBytes.Value) * 100, 2);
                 }
             }
-            @*var appId = downloadEvent.SteamDepot?.SteamAppId ?? 0;
-            var downloadIdentifierString = downloadEvent.DownloadIdentifierString;
-            var appHref = appId != 0 ? $"https://steamdb.info/app/{appId}/" : "";
-            var depotHref = downloadIdentifierString != null && downloadEvent.CacheIdentifier == "steam" ? $"https://steamdb.info/depot/{downloadIdentifierString}/" : null;
-            var imgUrl = appId != 0 ? $"https://cdn.cloudflare.steamstatic.com/steam/apps/{appId}/header.jpg" : ""; *@
             <tr class="@(_localStorage.GetItem<bool>(LocalStorageField.CompactLayoutEnabled) ? "compact-layout" : "")">
                 <td>
                     @downloadEvent.CacheIdentifier
