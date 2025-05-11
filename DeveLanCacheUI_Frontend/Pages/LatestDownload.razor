@@ -116,20 +116,20 @@
                     }
                 </td>
                 <td>
-                        @if (downloadEvent.DownloadInfo?.TotalBytes is not null or 0)
-                        {
-                            <progress max="100" value="@(totalPercent.ToString(CultureInfo.InvariantCulture))"></progress>
+                    @if (downloadEvent.DownloadInfo?.TotalBytes is not null and not 0)
+                    {
+                        <progress max="100" value="@(totalPercent.ToString(CultureInfo.InvariantCulture))"></progress>
 
-                            var totalBytesString = DeveCoolLib.Conversion.ValuesToStringHelper.BytesToString((long)downloadEvent.DownloadInfo?.TotalBytes!);
-                            var downloadedBytesString = DeveCoolLib.Conversion.ValuesToStringHelper.BytesToString(downloadEvent.CacheMissBytes + downloadEvent.CacheHitBytes);
-                            var progressString = totalPercent < 100 ? $"{downloadedBytesString}/{totalBytesString} ({totalPercent}%)" : $"{downloadedBytesString} (100%)";
+                        var totalBytesString = DeveCoolLib.Conversion.ValuesToStringHelper.BytesToString((long)downloadEvent.DownloadInfo?.TotalBytes!);
+                        var downloadedBytesString = DeveCoolLib.Conversion.ValuesToStringHelper.BytesToString(downloadEvent.CacheMissBytes + downloadEvent.CacheHitBytes);
+                        var progressString = totalPercent < 100 ? $"{downloadedBytesString}/{totalBytesString} ({totalPercent}%)" : $"{downloadedBytesString} (100%)";
 
-                            @progressString
-                        }
-                        else
-                        {
+                        @progressString
+                    }
+                    else
+                    {
                         <span>Could not find Manifest</span>
-                        }
+                    }
                 </td>
             </tr>
         }

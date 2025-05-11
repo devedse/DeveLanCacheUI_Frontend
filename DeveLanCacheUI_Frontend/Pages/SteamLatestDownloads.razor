@@ -112,7 +112,7 @@
                     }
                 </td>
                 <td>
-                    @if (downloadEvent.DownloadInfo?.TotalBytes is not null or 0)
+                    @if (downloadEvent.DownloadInfo?.TotalBytes is not null and not 0)
                     {
                         <progress max="100" value="@(totalPercent.ToString(CultureInfo.InvariantCulture))"></progress>
 
